@@ -18,6 +18,8 @@ import androidx.navigation.compose.* // rememberNavController, NavHost, composab
 import com.example.mytablayoutapp.customUi.contacts.ContactsScreen
 import com.example.mytablayoutapp.customUi.gallery.GalleryScreen
 import com.example.mytablayoutapp.customUi.freetheme.FreeThemeScreen
+import com.example.mytablayoutapp.customUi.profile.ProfileScreen
+
 // 4단계에서 만든 TabItem sealed class를 import 합니다.
 import com.example.mytablayoutapp.ui.TabItem
 // 프로젝트의 테마를 import 합니다. (프로젝트 생성 시 자동 생성됨)
@@ -54,7 +56,8 @@ fun MainScreen() {
     val tabs = listOf(
         TabItem.Contacts,
         TabItem.Gallery,
-        TabItem.FreeTheme
+        TabItem.FreeTheme,
+        TabItem.Profile
     )
 
     // Scaffold는 Material Design의 기본적인 화면 구조(상단 바, 하단 바, 본문 등)를 제공합니다.
@@ -125,5 +128,10 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
         composable(TabItem.FreeTheme.route) { // "free_theme_screen" 경로일 때 FreeThemeScreen 표시
             FreeThemeScreen()
         }
+        composable(TabItem.Profile.route) { // "profile_screen" 경로일 때 ProfileScreen 표시
+            ProfileScreen()
+        }
     }
+
+
 }

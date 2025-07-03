@@ -34,4 +34,12 @@ sealed class TabItem(val title: String, val icon: ImageVector, val route: String
         icon = Icons.Filled.Star, // 미리 정의된 별 아이콘
         route = "free_theme_screen"
     )
+
+    object Profile : TabItem(
+        title = "프로필",
+        icon = Icons.Filled.Star, // 미리 정의된 별 아이콘
+        route = "free_theme_screen"
+    )
+
+
 }
