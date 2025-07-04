@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons // Material Design 아이콘 세트
 import androidx.compose.material.icons.filled.Contacts // 연락처 아이콘
 import androidx.compose.material.icons.filled.PhotoLibrary // 갤러리 아이콘
 import androidx.compose.material.icons.filled.Star // 별 아이콘 (자유 주제용)
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.ui.graphics.vector.ImageVector // 벡터 아이콘을 위한 타입
 
 /**
@@ -17,10 +18,10 @@ import androidx.compose.ui.graphics.vector.ImageVector // 벡터 아이콘을 �
  */
 sealed class TabItem(val title: String, val icon: ImageVector, val route: String) {
     // object 키워드를 사용하여 각 탭을 싱글톤 인스턴스로 정의합니다.
-    object Contacts : TabItem(
-        title = "Join us",
+    object Home : TabItem(
+        title = "홈",
         icon = Icons.Filled.Contacts, // 미리 정의된 연락처 아이콘
-        route = "contacts_screen" // 이 탭 화면으로 이동하기 위한 고유 경로 이름
+        route = "home_screen" // 이 탭 화면으로 이동하기 위한 고유 경로 이름
     )
 
     object Gallery : TabItem(
@@ -29,16 +30,13 @@ sealed class TabItem(val title: String, val icon: ImageVector, val route: String
         route = "gallery_screen"
     )
 
-    object FreeTheme : TabItem(
-        title = "자유 주제",
-        icon = Icons.Filled.Star, // 미리 정의된 별 아이콘
-        route = "free_theme_screen"
-    )
 
     object Profile : TabItem(
         title = "프로필",
-        icon = Icons.Filled.Star, // 미리 정의된 별 아이콘
-        route = "free_theme_screen"
+        icon = Icons.Filled.AccountCircle, // 미리 정의된 원형 프로필 아이콘
+        route = "profile_screen" // 중요: Profile 탭의 실제 라우트 이름으로 변경해야 합니다.
+        // 현재 "free_theme_screen"으로 되어 있어 FreeTheme과 동일한 화면을 가리킵니다.
+        // MainActivity.kt의 AppNavigation에서 ProfileScreen()에 연결된 라우트와 일치시켜야 합니다.
     )
 
 

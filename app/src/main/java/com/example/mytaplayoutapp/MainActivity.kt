@@ -15,9 +15,8 @@ import androidx.navigation.NavHostController // 내비게이션을 제어하는 
 import androidx.navigation.compose.* // rememberNavController, NavHost, composable 등 Compose Navigation 관련 함수
 
 // 3단계에서 만든 화면 Composable 함수들을 import 합니다.
-import com.example.mytablayoutapp.customUi.contacts.ContactsScreen
+import com.example.mytablayoutapp.customUi.home.HomeScreen
 import com.example.mytablayoutapp.customUi.gallery.GalleryScreen
-import com.example.mytablayoutapp.customUi.freetheme.FreeThemeScreen
 import com.example.mytablayoutapp.customUi.profile.ProfileScreen
 
 // 4단계에서 만든 TabItem sealed class를 import 합니다.
@@ -54,9 +53,8 @@ fun MainScreen() {
 
     // 표시할 탭들의 목록을 정의합니다. TabItem에서 정의한 객체들을 사용합니다.
     val tabs = listOf(
-        TabItem.Contacts,
+        TabItem.Home,
         TabItem.Gallery,
-        TabItem.FreeTheme,
         TabItem.Profile
     )
 
@@ -115,18 +113,15 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
     // navController를 통해 현재 표시할 화면을 결정하고, startDestination으로 앱 시작 시 첫 화면을 지정합니다.
     NavHost(
         navController = navController,
-        startDestination = TabItem.Contacts.route, // 앱 시작 시 "연락처" 탭을 기본으로 표시
+        startDestination = TabItem.Home.route, // 앱 시작 시 "연락처" 탭을 기본으로 표시
         modifier = modifier // Scaffold로부터 전달받은 패딩 등을 적용
     ) {
         // composable(route) { Composable 함수 } 형식으로 각 라우트와 화면을 매핑합니다.
-        composable(TabItem.Contacts.route) { // "contacts_screen" 경로일 때 ContactsScreen 표시
-            ContactsScreen()
+        composable(TabItem.Home.route) { // "contacts_screen" 경로일 때 ContactsScreen 표시
+            HomeScreen()
         }
         composable(TabItem.Gallery.route) { // "gallery_screen" 경로일 때 GalleryScreen 표시
             GalleryScreen()
-        }
-        composable(TabItem.FreeTheme.route) { // "free_theme_screen" 경로일 때 FreeThemeScreen 표시
-            FreeThemeScreen()
         }
         composable(TabItem.Profile.route) { // "profile_screen" 경로일 때 ProfileScreen 표시
             ProfileScreen()
