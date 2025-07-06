@@ -1,5 +1,5 @@
 // 파일 경로: app/src/main/java/com/example/mytablayoutapp/customUi/profile/ProfileScreen.kt
-package com.example.mytablayoutapp.customUi.profile
+package com.example.daejeonpass.customUi.profile
 
 
 

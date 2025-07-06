@@ -1,5 +1,5 @@
 // 파일 경로: app/src/main/java/com/example/mytablayoutapp/customUi/home/HomeScreen.kt
-package com.example.mytablayoutapp.customUi.home // 파일이 위치한 패키지 경로
+package com.example.daejeonpass.customUi.home // 파일이 위치한 패키지 경로
 
 import androidx.compose.foundation.layout.Box // UI 요소를 담는 컨테이너
 import androidx.compose.foundation.layout.fillMaxSize // 화면 전체를 채우도록 크기 지정

@@ -1,5 +1,5 @@
 // 파일 경로: app/src/main/java/com/example/mytablayoutapp/MainActivity.kt
-package com.example.mytablayoutapp // 여러분의 프로젝트 패키지 이름
+package com.example.daejeonpass // 여러분의 프로젝트 패키지 이름
 
 import android.os.Bundle // 액티비티 상태 저장을 위한 번들
 import androidx.activity.ComponentActivity // Compose를 사용하는 액티비티의 기본 클래스
@@ -13,16 +13,19 @@ import androidx.navigation.NavDestination.Companion.hierarchy // 내비게이션
 import androidx.navigation.NavGraph.Companion.findStartDestination // 내비게이션 그래프의 시작점 찾기
 import androidx.navigation.NavHostController // 내비게이션을 제어하는 컨트롤러
 import androidx.navigation.compose.* // rememberNavController, NavHost, composable 등 Compose Navigation 관련 함수
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.daejeonpass.model.CommentViewModel // 리뷰 댓글 관리 모델
 // 3단계에서 만든 화면 Composable 함수들을 import 합니다.
-import com.example.mytablayoutapp.customUi.home.HomeScreen
-import com.example.mytablayoutapp.customUi.gallery.GalleryScreen
-import com.example.mytablayoutapp.customUi.profile.ProfileScreen
+import com.example.daejeonpass.customUi.home.HomeScreen
+import com.example.daejeonpass.customUi.gallery.GalleryScreen
+import com.example.daejeonpass.customUi.gallery.ReviewDetailScreen
+import com.example.daejeonpass.customUi.profile.ProfileScreen
 
 // 4단계에서 만든 TabItem sealed class를 import 합니다.
-import com.example.mytablayoutapp.ui.TabItem
+import customUi.TabItem
 // 프로젝트의 테마를 import 합니다. (프로젝트 생성 시 자동 생성됨)
-import com.example.mytaplayoutapp.ui.theme.KoreaPassTheme // 여러분의 프로젝트 테마 이름으로 변경
+import com.example.daejeonpass.ui.theme.KoreaPassTheme // 여러분의 프로젝트 테마 이름으로 변경
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,11 +124,34 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
             HomeScreen()
         }
         composable(TabItem.Gallery.route) { // "gallery_screen" 경로일 때 GalleryScreen 표시
-            GalleryScreen()
+            GalleryScreen(navController = navController)
         }
         composable(TabItem.Profile.route) { // "profile_screen" 경로일 때 ProfileScreen 표시
             ProfileScreen()
         }
+        composable("review_detail/{imageRes}/{reviewId}") { backStackEntry ->
+            val imageRes = backStackEntry.arguments?.getString("imageRes")?.toInt() ?: 0
+            val reviewIdFromNav = backStackEntry.arguments?.getString("reviewId")?.toIntOrNull() ?: 0
+
+            // Obtain an instance of CommentViewModel
+            // This instance will be scoped appropriately by the navigation library.
+            val commentViewModel: CommentViewModel = viewModel()
+
+            ReviewDetailScreen(
+                reviewId = reviewIdFromNav,
+                viewModel = commentViewModel,
+                profileImage = R.drawable.profile1,
+                authorName = "홍길동",
+                date = "2025.07.05",
+                reviewTitle = "대전 여행기",
+                rating = 4.5f,
+                reviewContent = "이곳은 정말 아름다운 여행지입니다! 강력 추천합니다.",
+                navController = navController ,
+                imageResFromNav = imageRes
+            )
+        }
+
+
     }
 
 

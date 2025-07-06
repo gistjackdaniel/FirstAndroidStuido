@@ -1,4 +1,4 @@
-package com.example.mytaplayoutapp.ui.theme
+package com.example.daejeonpass.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mytaplayoutapp"
+    namespace = "com.example.daejeonpass"
     compileSdk = 35
 
     defaultConfig {
@@ -60,6 +60,8 @@ dependencies {
     // Material 아이콘 사용을 위한 라이브러리 (선택 사항이지만, 탭 아이콘에 유용)
     implementation("androidx.compose.material:material-icons-core:1.7.0")
     implementation("androidx.compose.material:material-icons-extended:1.7.0")
+    // viewModel() composable function from the androidx.lifecycle:lifecycle-viewmodel-compose library
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
