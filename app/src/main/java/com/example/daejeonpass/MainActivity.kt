@@ -55,7 +55,7 @@ fun MainScreen() {
     // rememberNavController(): 내비게이션 상태를 기억하고 관리하는 NavController 인스턴스를 생성합니다.
     // 화면 회전 등 구성 변경에도 상태를 유지합니다.
     val navController = rememberNavController()
-
+    val commentViewModel: CommentViewModel = remember { CommentViewModel() } // 앱 전체 생명주기 유지
     // 표시할 탭들의 목록을 정의합니다. TabItem에서 정의한 객체들을 사용합니다.
     val tabs = listOf(
         TabItem.Home,
@@ -101,6 +101,7 @@ fun MainScreen() {
         // innerPadding을 전달하여 내용이 시스템 바나 네비게이션 바에 가려지지 않도록 합니다.
         AppNavigation(
             navController = navController,
+            commentViewModel,
             modifier = Modifier.padding(innerPadding) // 패딩 적용
         )
     }
@@ -113,7 +114,9 @@ fun MainScreen() {
  * @param modifier 외부에서 전달받는 Modifier (여기서는 Scaffold의 패딩을 적용하기 위함)
  */
 @Composable
-fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifier) {
+fun AppNavigation(navController: NavHostController,
+                  commentViewModel: CommentViewModel,
+                  modifier: Modifier = Modifier) {
     // NavHost는 내비게이션 그래프의 컨테이너 역할을 합니다.
     // navController를 통해 현재 표시할 화면을 결정하고, startDestination으로 앱 시작 시 첫 화면을 지정합니다.
     NavHost(
@@ -139,13 +142,6 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
             ) { backStackEntry ->
             val imageRes = backStackEntry.arguments?.getInt("imageRes") ?: 0
             val reviewIdFromNav = backStackEntry.arguments?.getInt("reviewId") ?: 0
-
-            // CommentViewModel 인스턴스 가져오기
-            // 이 ViewModel은 해당 NavBackStackEntry의 생명주기를 따르거나
-            // NavHostController에 의해 더 넓은 범위로 관리될 수 있어 상태 유지가 가능합니다.
-            // key를 사용하여 reviewId별로 다른 ViewModel 인스턴스를 갖도록 할 수도 있지만,
-            // NavBackStackEntry별로 ViewModel이 관리되므로 일반적으로는 불필요.
-            val commentViewModel: CommentViewModel = viewModel()
 
             ReviewDetailScreen(
                 reviewId = reviewIdFromNav,

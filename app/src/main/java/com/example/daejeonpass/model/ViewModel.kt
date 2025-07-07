@@ -1,6 +1,9 @@
 // file: app/src/main/java/com/example/daejeonpass/model/CommentViewModel.kt
 package com.example.daejeonpass.model
 
+import androidx.compose.runtime.mutableStateListOf // SnapshotStateList 사용을 위해 추가
+import androidx.compose.runtime.mutableStateMapOf // mutableStateMapOf 사용을 위해 추가
+import androidx.compose.runtime.snapshots.SnapshotStateList // 타입 명시를 위해 추가
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.daejeonpass.R
@@ -26,31 +29,38 @@ class CommentViewModel : ViewModel() {
     private val _reviewDetails = MutableStateFlow<ReviewDetails?>(null)
     val reviewDetails: StateFlow<ReviewDetails?> = _reviewDetails.asStateFlow()
 
+    // --- 댓글 데이터 관리 방식 변경 ---
+    // Key: reviewId, Value: 해당 리뷰의 댓글 목록 (SnapshotStateList)
+    private val _commentsMap = mutableStateMapOf<Int, SnapshotStateList<ReviewComment>>()
+    // 외부에 노출 시에는 불변 Map으로 노출할 수 있으나, Composable에서 직접 사용 시 SnapshotStateMap 자체를 사용해도 됨
+    // 여기서는 Composable에서 reviewId로 직접 접근하여 SnapshotStateList를 사용하도록 유도
+    fun getCommentsForReview(reviewId: Int): SnapshotStateList<ReviewComment> {
+        return _commentsMap.getOrPut(reviewId) {
+            mutableStateListOf() // 해당 reviewId에 대한 리스트가 없으면 새로 생성
+        }
+    }
+
     // 내부 데이터 저장소: Key: reviewId, Value: 해당 리뷰의 ReviewComment 목록
     private val _commentsData = mutableMapOf<Int, MutableList<ReviewComment>>()
 
     // 각 reviewId별 댓글 목록을 발행하는 StateFlow 관리 맵
     private val _reviewCommentFlows = mutableMapOf<Int, MutableStateFlow<List<ReviewComment>>>()
 
-
     init {
         // ViewModel 생성 시 더미 데이터 초기화 (예시)
         // 실제 앱에서는 네트워크 또는 로컬 DB에서 데이터를 로드합니다.
-        val dummyReviewId1 = 1 // 예시 리뷰 ID
-        _commentsData[dummyReviewId1] = mutableListOf(
-            ReviewComment(reviewId = dummyReviewId1, authorName = "김투어", content = "대전 정말 멋져요! (더미)"),
-            ReviewComment(reviewId = dummyReviewId1, authorName = "박여행", content = "성심당 꼭 가세요! (더미)")
-        )
-        // 필요한 경우 다른 리뷰 ID에 대한 더미 데이터도 추가
-
-        // 초기 댓글 Flow 발행 (해당 ID로 접근 시 즉시 댓글 보이도록)
-        _reviewCommentFlows[dummyReviewId1] = MutableStateFlow(
-            _commentsData[dummyReviewId1]?.toList() ?: emptyList()
-        )
-
-
-
+        val dummyReviewIdForInitialComments = 1
+        val initialCommentsList = getCommentsForReview(dummyReviewIdForInitialComments)
+        if (initialCommentsList.isEmpty()) { // 중복 추가 방지
+            initialCommentsList.addAll(
+                listOf(
+                    ReviewComment(reviewId = dummyReviewIdForInitialComments, authorName = "김투어", content = "대전 정말 멋져요! (초기 댓글)"),
+                    ReviewComment(reviewId = dummyReviewIdForInitialComments, authorName = "박여행", content = "성심당 꼭 가세요! (초기 댓글)")
+                )
+            )
+        }
     }
+
 
     // 리뷰 상세 정보와 댓글을 로드하는 함수
     fun loadReviewData(reviewId: Int, imageResFromNav: Int) {
@@ -67,12 +77,12 @@ class CommentViewModel : ViewModel() {
                 val fetchedDetails = ReviewDetails(
                     id = reviewId,
                     title = "대전 여행 후기 ($reviewId)",
-                    content = "이곳은 $reviewId 번째 리뷰의 상세 내용입니다. 전달받은 대표 이미지 리소스 ID는 $imageResFromNav 입니다. 아름다운 풍경과 맛있는 음식이 가득한 곳이었어요. 다음에 또 방문하고 싶습니다! 이 내용은 ViewModel에서 생성된 더미 데이터입니다.",
+                    content = "이곳은 $reviewId 번째 리뷰의 상세 내용입니다.",
                     authorName = "여행가 $reviewId",
                     profileImageRes = R.drawable.profile1, // 예시 프로필 이미지
                     reviewImageRes = imageResFromNav, // Gallery에서 전달받은 이미지
                     date = "2024-07-26",
-                    rating = (reviewId % 5).toFloat() // 0.0f ~ 4.0f 사이의 더미 별점
+                    rating = (reviewId % 6).toFloat() // 0.0f ~ 5.0f 사이의 더미 별점
                 )
                 _reviewDetails.value = fetchedDetails
             }
@@ -82,62 +92,45 @@ class CommentViewModel : ViewModel() {
             // 그리고 해당 StateFlow에 발행합니다.
             // getCommentsFlow 함수가 이 역할을 이미 하고 있으므로, 여기서는 호출만으로 충분할 수 있습니다.
             // 다만, 최초 로드 시 댓글이 없다면 더미 댓글을 추가하는 로직은 여기에 두는 것이 명확합니다.
-            if (!_commentsData.containsKey(reviewId)) {
-                val dummyComments = if (reviewId % 2 == 0) { // 짝수 ID
-                    mutableListOf(
-                        ReviewComment(reviewId = reviewId, authorName = "짝수리뷰 팬", content = "$reviewId 리뷰 아주 좋아요! (ViewModel 생성)"),
-                        ReviewComment(reviewId = reviewId, authorName = "댓글러123", content = "이런 정보 감사합니다 ($reviewId). (ViewModel 생성)")
+            val commentsList = getCommentsForReview(reviewId)
+            if (commentsList.isEmpty() && reviewId != 1 /* init에서 이미 처리한 ID 제외 */) {
+                // 이전에 로드된 적 없는 reviewId에 대해서만 더미 댓글 추가 (init과 중복 방지)
+                val dummyComments = if (reviewId % 2 == 0) {
+                    listOf(
+                        ReviewComment(reviewId = reviewId, authorName = "짝수리뷰 팬", content = "${reviewId}번째 동행 후기도 아주 좋아요! "),
+                        ReviewComment(reviewId = reviewId, authorName = "($reviewId)번째 리뷰 팬", content = "이런 정보 아리가또요또요또요대전또요! ")
                     )
-                } else { // 홀수 ID
-                    mutableListOf(
-                        ReviewComment(reviewId = reviewId, authorName = "홀수리뷰 방문객", content = "우와, $reviewId 번째 리뷰라니! (ViewModel 생성)"),
-                        ReviewComment(reviewId = reviewId, authorName = "여행가고싶다", content = "$reviewId 정보 잘 봤습니다. (ViewModel 생성)")
+                } else {
+                    listOf(
+                        ReviewComment(reviewId = reviewId, authorName = "홀수리뷰 팬", content = "와우와우, ${reviewId}번째 동행후기도 알차네요!"),
+                        ReviewComment(reviewId = reviewId, authorName = "($reviewId)번째 리뷰 팬", content = "와우 프로필 존잘 ㄷㄷ 차은우님도 동행을 가시네.")
                     )
                 }
-                _commentsData[reviewId] = dummyComments
-            }
-            // 해당 reviewId의 댓글 Flow에 최신 댓글 목록을 발행합니다.
-            // getOrPut을 사용하여 Flow가 없으면 새로 만들고, 있으면 기존 Flow를 사용합니다.
-            _reviewCommentFlows.getOrPut(reviewId) { MutableStateFlow(emptyList()) }
-                .emit(_commentsData[reviewId]?.toList() ?: emptyList())
-        }
-    }
-
-
-
-
-
-    // 댓글 목록을 위한 StateFlow를 반환하는 함수
-    fun getCommentsFlow(reviewId: Int): StateFlow<List<ReviewComment>> {
-        synchronized(_reviewCommentFlows) { // 동시 접근 제어
-            return _reviewCommentFlows.getOrPut(reviewId) {
-                // ViewModel 초기화 시 또는 loadReviewData에서 _commentsData가 채워질 수 있음
-                val initialComments = _commentsData[reviewId]?.toList() ?: emptyList()
-                MutableStateFlow(initialComments)
+                commentsList.addAll(dummyComments)
             }
         }
     }
 
-    // 댓글 추가 함수
+
+
+
+
+
+
+
+    // 댓글 추가 함수 (SnapshotStateList 직접 사용)
     fun addCommentToReview(reviewId: Int, author: String, content: String) {
         val newComment = ReviewComment(
             reviewId = reviewId,
             authorName = author,
             content = content
-            // timestamp는 ReviewComment 데이터 클래스에서 기본값으로 현재 시간 설정
-        )
-
-        val commentsList = synchronized(_commentsData) { // 동시 접근 제어
-            _commentsData.getOrPut(reviewId) { mutableListOf() }.also {
-                it.add(0, newComment) // 새 댓글을 목록 맨 위에 추가 (최신 댓글이 위로)
-            }
-        }
-
-        // 해당 reviewId의 StateFlow에 업데이트된 댓글 목록 발행
-        _reviewCommentFlows[reviewId]?.let { flow ->
-            viewModelScope.launch {
-                flow.emit(commentsList.toList()) // StateFlow에 업데이트된 불변 리스트 발행
-            }
-        }
+        ) // timestamp는 ReviewComment 데이터 클래스에서 기본값으로 현재 시간 설정
+        // getCommentsForReview를 통해 해당 reviewId의 SnapshotStateList를 가져오고,
+        // 여기에 직접 댓글을 추가합니다. Compose UI는 이 변경을 감지합니다.
+        getCommentsForReview(reviewId).add(0, newComment) // 새 댓글을 맨 위에 추가
     }
+
+
+
+
 }

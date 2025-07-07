@@ -40,6 +40,7 @@ import com.example.daejeonpass.data.ReviewThumbnailInfo
 import com.example.daejeonpass.model.CommentViewModel
 import com.example.daejeonpass.model.ReviewDetails // 새로 추가한 데이터 클래스 임포트
 import kotlin.text.isNotBlank
+import androidx.compose.runtime.snapshots.SnapshotStateList // 추가
 
 /**
  * ✅ GalleryScreen (리뷰 화면) Composable 함수
@@ -129,7 +130,11 @@ fun ReviewDetailScreen(
 
     // ViewModel로부터 StateFlow를 구독하여 리뷰 상세 정보와 ReviewComment 리스트를 가져옵니다.
     val reviewDetailsData by viewModel.reviewDetails.collectAsState()
-    val commentsState by viewModel.getCommentsFlow(reviewId).collectAsState()
+    // --- 댓글 상태 가져오는 방식 변경 ---
+    // 이전: val commentsState by viewModel.getCommentsFlow(reviewId).collectAsState()
+    // 변경: SnapshotStateList를 직접 사용
+    val commentsState: SnapshotStateList<ReviewComment> = viewModel.getCommentsForReview(reviewId)
+    // --- 댓글 상태 가져오는 방식 변경 완료 ---
 
 
     // reviewDetailsData가 null (로딩 중)일 때와 아닐 때를 구분하여 UI 표시
