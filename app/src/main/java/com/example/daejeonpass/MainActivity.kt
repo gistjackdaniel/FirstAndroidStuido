@@ -14,6 +14,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination // 내비게�
 import androidx.navigation.NavHostController // 내비게이션을 제어하는 컨트롤러
 import androidx.navigation.compose.* // rememberNavController, NavHost, composable 등 Compose Navigation 관련 함수
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.daejeonpass.model.CommentViewModel // 리뷰 댓글 관리 모델
 // 3단계에서 만든 화면 Composable 함수들을 import 합니다.
 import com.example.daejeonpass.customUi.home.HomeScreen
@@ -129,23 +131,25 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
         composable(TabItem.Profile.route) { // "profile_screen" 경로일 때 ProfileScreen 표시
             ProfileScreen()
         }
-        composable("review_detail/{imageRes}/{reviewId}") { backStackEntry ->
-            val imageRes = backStackEntry.arguments?.getString("imageRes")?.toInt() ?: 0
-            val reviewIdFromNav = backStackEntry.arguments?.getString("reviewId")?.toIntOrNull() ?: 0
+        composable("review_detail/{imageRes}/{reviewId}",
+            arguments = listOf(
+                navArgument("imageRes") { type = NavType.IntType },
+                navArgument("reviewId") { type = NavType.IntType }
+            )
+            ) { backStackEntry ->
+            val imageRes = backStackEntry.arguments?.getInt("imageRes") ?: 0
+            val reviewIdFromNav = backStackEntry.arguments?.getInt("reviewId") ?: 0
 
-            // Obtain an instance of CommentViewModel
-            // This instance will be scoped appropriately by the navigation library.
+            // CommentViewModel 인스턴스 가져오기
+            // 이 ViewModel은 해당 NavBackStackEntry의 생명주기를 따르거나
+            // NavHostController에 의해 더 넓은 범위로 관리될 수 있어 상태 유지가 가능합니다.
+            // key를 사용하여 reviewId별로 다른 ViewModel 인스턴스를 갖도록 할 수도 있지만,
+            // NavBackStackEntry별로 ViewModel이 관리되므로 일반적으로는 불필요.
             val commentViewModel: CommentViewModel = viewModel()
 
             ReviewDetailScreen(
                 reviewId = reviewIdFromNav,
                 viewModel = commentViewModel,
-                profileImage = R.drawable.profile1,
-                authorName = "홍길동",
-                date = "2025.07.05",
-                reviewTitle = "대전 여행기",
-                rating = 4.5f,
-                reviewContent = "이곳은 정말 아름다운 여행지입니다! 강력 추천합니다.",
                 navController = navController ,
                 imageResFromNav = imageRes
             )

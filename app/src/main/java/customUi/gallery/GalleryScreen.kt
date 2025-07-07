@@ -38,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import com.example.daejeonpass.data.ReviewComment
 import com.example.daejeonpass.data.ReviewThumbnailInfo
 import com.example.daejeonpass.model.CommentViewModel
+import com.example.daejeonpass.model.ReviewDetails // 새로 추가한 데이터 클래스 임포트
 import kotlin.text.isNotBlank
 
 /**
@@ -116,28 +117,24 @@ fun GalleryScreen(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewDetailScreen(
-    profileImage: Int, // 추가된 프로필 이미지
-    authorName: String,     // 추가된 닉네임
-    date: String,     // 추가된 게시 날짜
-    rating: Float,        // 추가된 별점
-    reviewTitle: String,
-    imageResFromNav: Int,
-    reviewContent: String,
     navController: NavController,
-    reviewId: Int, // 리뷰 ID기준으로 댓글 가져옴
-    viewModel: CommentViewModel // 리뷰 댓글 모델
+    reviewId: Int,          // 네비게이션으로 전달받는 리뷰 ID
+    imageResFromNav: Int, // 네비게이션으로 전달받는 대표 이미지 (ViewModel의 loadReviewData에 사용)
+    viewModel: CommentViewModel // ViewModel 인스턴스
 ) {
     LaunchedEffect(key1 = reviewId, key2 = imageResFromNav) {
         viewModel.loadReviewData(reviewId, imageResFromNav)
     }
 
 
-    // ViewModel로부터 StateFlow를 구독하여 ReviewComment 리스트를 가져옵니다.
+    // ViewModel로부터 StateFlow를 구독하여 리뷰 상세 정보와 ReviewComment 리스트를 가져옵니다.
+    val reviewDetailsData by viewModel.reviewDetails.collectAsState()
     val commentsState by viewModel.getCommentsFlow(reviewId).collectAsState()
 
-    // reviewDetails가 null이 아닐 때 UI를 표시합니다. (데이터 로딩 중일 수 있음)
 
-    Scaffold(
+    // reviewDetailsData가 null (로딩 중)일 때와 아닐 때를 구분하여 UI 표시
+    reviewDetailsData?.let { details -> // details는 ReviewDetails 타입
+        Scaffold(
             topBar = {
                 TopAppBar(
                     title = { Text("DAEJEON Travel Mate") }, // Or whatever title is appropriate
@@ -173,13 +170,14 @@ fun ReviewDetailScreen(
                     .padding(paddingValues)
                     .padding(16.dp)
             ) {
+                // --- 리뷰 상세 정보 표시 ---
                 item {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Image(
-                            painter = painterResource(id = profileImage),
+                            painter = painterResource(id = details.profileImageRes),// ViewModel 데이터 사용
                             contentDescription = "프로필 이미지",
                             modifier = Modifier
                                 .size(40.dp)
@@ -190,14 +188,14 @@ fun ReviewDetailScreen(
                         Spacer(modifier = Modifier.width(8.dp))
 
                         Text(
-                            text = authorName,
+                            text = details.authorName,
                             style = MaterialTheme.typography.bodyMedium
                         )
 
                         Spacer(modifier = Modifier.weight(1f))
 
                         Text(
-                            text = date,
+                            text = details.date,
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -205,7 +203,7 @@ fun ReviewDetailScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = reviewTitle,
+                        text = details.title,
                         style = MaterialTheme.typography.titleMedium
                     )
 
@@ -214,7 +212,7 @@ fun ReviewDetailScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         repeat(5) { index ->
                             val imageVector =
-                                if (index < rating.toInt()) Icons.Filled.Star else Icons.Outlined.StarOutline
+                                if (index < details.rating.toInt()) Icons.Filled.Star else Icons.Outlined.StarOutline
                             Icon( // Use Icon composable
                                 imageVector = imageVector,
                                 contentDescription = "별점",
@@ -227,7 +225,7 @@ fun ReviewDetailScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Image(
-                        painter = painterResource(id = imageResFromNav),
+                        painter = painterResource(id = details.reviewImageRes),
                         contentDescription = "대표 이미지",
                         modifier = Modifier
                             .fillMaxWidth()
@@ -237,20 +235,29 @@ fun ReviewDetailScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(text = reviewContent, style = MaterialTheme.typography.bodyLarge)
+                    Text(text = details.content, style = MaterialTheme.typography.bodyLarge)
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(text = "댓글", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = "댓글 (${commentsState.size})",
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
 
-                items(
-                    items = commentsState, // StateFlow에서 가져온 List<ReviewComment> 사용
-                    key = { comment -> comment.id } // ReviewComment의 고유 id를 key로 사용
-                ) { reviewComment ->
-                    // CommentListItem을 ReviewComment 객체를 받도록 수정하거나,
-                    // 여기서 직접 ReviewComment의 필드를 사용하여 UI 구성
-                    CommentListItemFromData(reviewComment) // 아래에 정의할 새 Composable
+                // --- 댓글 목록 표시 ---
+                if (commentsState.isEmpty()) {
+                    item {
+                        Text(
+                            "아직 댓글이 없습니다. 첫 댓글을 남겨주세요!",
+                            modifier = Modifier.padding(vertical = 16.dp),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                } else {
+                    items(items = commentsState, key = { it.id }) { reviewComment ->
+                        CommentListItemFromData(comment = reviewComment)
+                    }
                 }
 
                 // 댓글 입력 UI
@@ -264,9 +271,31 @@ fun ReviewDetailScreen(
                 }
             }
         }
-
+    } ?: run {
+    // reviewDetailsData가 null일 경우 (로딩 중) 표시할 UI
+    Scaffold( // Scaffold를 사용하여 TopAppBar 일관성 유지
+        topBar = {
+            TopAppBar(
+                title = { Text("DAEJEON Travel Mate") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로 가기")
+                    }
+                },
+                actions = { /* 로딩 중에는 액션 버튼 비활성화 또는 숨김 처리 가능 */ }
+            )
+        }
+    ){ paddingValues ->
+        Box(
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+            Text("리뷰를 불러오는 중...", modifier = Modifier.padding(top = 60.dp))
+        }
+    }
 }
-
+}
 
 /**
  * 📍 댓글 리스트 아이템 Composable 함수
