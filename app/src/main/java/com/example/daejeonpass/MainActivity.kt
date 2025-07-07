@@ -1,5 +1,5 @@
 // 파일 경로: app/src/main/java/com/example/mytablayoutapp/MainActivity.kt
-package com.example.mytablayoutapp // 여러분의 프로젝트 패키지 이름
+package com.example.daejeonpass // 여러분의 프로젝트 패키지 이름
 
 import android.os.Bundle // 액티비티 상태 저장을 위한 번들
 import androidx.activity.ComponentActivity // Compose를 사용하는 액티비티의 기본 클래스
@@ -13,16 +13,21 @@ import androidx.navigation.NavDestination.Companion.hierarchy // 내비게이션
 import androidx.navigation.NavGraph.Companion.findStartDestination // 내비게이션 그래프의 시작점 찾기
 import androidx.navigation.NavHostController // 내비게이션을 제어하는 컨트롤러
 import androidx.navigation.compose.* // rememberNavController, NavHost, composable 등 Compose Navigation 관련 함수
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.daejeonpass.model.CommentViewModel // 리뷰 댓글 관리 모델
 // 3단계에서 만든 화면 Composable 함수들을 import 합니다.
-import com.example.mytablayoutapp.customUi.home.HomeScreen
-import com.example.mytablayoutapp.customUi.gallery.GalleryScreen
-import com.example.mytablayoutapp.customUi.profile.ProfileScreen
+import com.example.daejeonpass.customUi.home.HomeScreen
+import com.example.daejeonpass.customUi.gallery.GalleryScreen
+import com.example.daejeonpass.customUi.gallery.ReviewDetailScreen
+import com.example.daejeonpass.customUi.profile.ProfileScreen
 
 // 4단계에서 만든 TabItem sealed class를 import 합니다.
-import com.example.mytablayoutapp.ui.TabItem
+import customUi.TabItem
 // 프로젝트의 테마를 import 합니다. (프로젝트 생성 시 자동 생성됨)
-import com.example.mytaplayoutapp.ui.theme.KoreaPassTheme // 여러분의 프로젝트 테마 이름으로 변경
+import com.example.daejeonpass.ui.theme.KoreaPassTheme // 여러분의 프로젝트 테마 이름으로 변경
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +55,7 @@ fun MainScreen() {
     // rememberNavController(): 내비게이션 상태를 기억하고 관리하는 NavController 인스턴스를 생성합니다.
     // 화면 회전 등 구성 변경에도 상태를 유지합니다.
     val navController = rememberNavController()
-
+    val commentViewModel: CommentViewModel = remember { CommentViewModel() } // 앱 전체 생명주기 유지
     // 표시할 탭들의 목록을 정의합니다. TabItem에서 정의한 객체들을 사용합니다.
     val tabs = listOf(
         TabItem.Home,
@@ -96,6 +101,7 @@ fun MainScreen() {
         // innerPadding을 전달하여 내용이 시스템 바나 네비게이션 바에 가려지지 않도록 합니다.
         AppNavigation(
             navController = navController,
+            commentViewModel,
             modifier = Modifier.padding(innerPadding) // 패딩 적용
         )
     }
@@ -108,7 +114,9 @@ fun MainScreen() {
  * @param modifier 외부에서 전달받는 Modifier (여기서는 Scaffold의 패딩을 적용하기 위함)
  */
 @Composable
-fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifier) {
+fun AppNavigation(navController: NavHostController,
+                  commentViewModel: CommentViewModel,
+                  modifier: Modifier = Modifier) {
     // NavHost는 내비게이션 그래프의 컨테이너 역할을 합니다.
     // navController를 통해 현재 표시할 화면을 결정하고, startDestination으로 앱 시작 시 첫 화면을 지정합니다.
     NavHost(
@@ -121,11 +129,29 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
             HomeScreen()
         }
         composable(TabItem.Gallery.route) { // "gallery_screen" 경로일 때 GalleryScreen 표시
-            GalleryScreen()
+            GalleryScreen(navController = navController)
         }
         composable(TabItem.Profile.route) { // "profile_screen" 경로일 때 ProfileScreen 표시
             ProfileScreen()
         }
+        composable("review_detail/{imageRes}/{reviewId}",
+            arguments = listOf(
+                navArgument("imageRes") { type = NavType.IntType },
+                navArgument("reviewId") { type = NavType.IntType }
+            )
+            ) { backStackEntry ->
+            val imageRes = backStackEntry.arguments?.getInt("imageRes") ?: 0
+            val reviewIdFromNav = backStackEntry.arguments?.getInt("reviewId") ?: 0
+
+            ReviewDetailScreen(
+                reviewId = reviewIdFromNav,
+                viewModel = commentViewModel,
+                navController = navController ,
+                imageResFromNav = imageRes
+            )
+        }
+
+
     }
 
 
