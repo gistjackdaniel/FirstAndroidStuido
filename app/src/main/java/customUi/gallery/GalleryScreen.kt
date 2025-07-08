@@ -39,8 +39,10 @@ import com.example.daejeonpass.data.ReviewComment
 import com.example.daejeonpass.model.ReviewViewModel
 import kotlin.text.isNotBlank
 import androidx.compose.runtime.snapshots.SnapshotStateList // 추가
+import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
 import com.example.daejeonpass.model.UserProfile
+import com.example.daejeonpass.utils.drawablePngToUri
 
 /**
  * ✅ GalleryScreen (리뷰 화면) Composable 함수
@@ -52,7 +54,7 @@ import com.example.daejeonpass.model.UserProfile
 @Composable
 fun GalleryScreen(
     navController: NavController,
-    viewModel: ReviewViewModel, // ViewModel 주입
+    viewModel: ReviewViewModel // ViewModel 주입
 ) {
     val reviewThumbnails = viewModel.reviewThumbnails // SnapshotStateList 직접 사용
 
@@ -149,6 +151,20 @@ fun ReviewDetailScreen(
                                 // Optional: tint = MaterialTheme.colorScheme.onPrimary // If needed for visibility
                             )
                         }
+                    },
+                    actions = { // For icons on the right side
+                        IconButton(onClick = { /* TODO: 알림 화면 이동 */ }) {
+                            Icon(
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = "알림"
+                                // Optional: tint = MaterialTheme.colorScheme.onPrimary // If needed for visibility
+                            )
+                        }
+                        // You can add more IconButton actions here if needed
+                        // For example:
+                        // IconButton(onClick = { /* Another action */ }) {
+                        //     Icon(Icons.Default.Share, contentDescription = "공유")
+                        // }
                     }
                 )
             }
@@ -166,13 +182,14 @@ fun ReviewDetailScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Image(
-                            painter = rememberAsyncImagePainter(model = details.profileImageUri),
-                            contentDescription = "프로필 이미지",
+                            painter = rememberAsyncImagePainter(details.profileImageUri),
+                            contentDescription = "작성자 프로필 이미지",
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(CircleShape),
                             contentScale = ContentScale.Crop
                         )
+
 
                         Spacer(modifier = Modifier.width(8.dp))
 
@@ -295,19 +312,22 @@ fun ReviewDetailScreen(
  */
 @Composable
 fun CommentListItemFromData(comment: ReviewComment) {
+    val context = LocalContext.current
+
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             // 프로필 이미지는 comment.profileImageUrl 등이 있다면 사용
             Image(
-                painter = painterResource(id = R.drawable.basic_profile), // 예시 프로필
-                contentDescription = "프로필 이미지",
+                painter = rememberAsyncImagePainter(context.drawablePngToUri(R.drawable.review_boy, "review_boy.png")),
+                contentDescription = "프로필이미지",
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
+
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = comment.authorName, style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.weight(1f))

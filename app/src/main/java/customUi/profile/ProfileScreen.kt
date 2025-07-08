@@ -8,8 +8,8 @@
 
 // ProfileScreen.kt (지난 동행 내역 + 후기 작성 화면)
 
-// 파일 경로: app/src/main/java/com/example/DaejeonPass/customUi/profile/ProfileScreen.kt
-package customUi.profile
+// 파일 경로: app/src/main/java/com/example/mytablayoutapp/customUi/profile/ProfileScreen.kt
+package com.example.daejeonpass.customUi.profile
 
 
 

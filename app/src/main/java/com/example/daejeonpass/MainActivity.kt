@@ -52,10 +52,10 @@ import customUi.home.NewPost
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.daejeonpass.customUi.gallery.ReviewDetailScreen
+import com.example.daejeonpass.customUi.profile.ProfileScreen
+import com.example.daejeonpass.customUi.profile.ReviewWriteScreen
 import com.example.daejeonpass.model.ReviewViewModel
 import com.example.daejeonpass.model.ReviewViewModelFactory
-import customUi.profile.ProfileScreen
-import customUi.profile.ReviewWriteScreen
 import com.example.daejeonpass.utils.drawablePngToUri
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -317,7 +317,8 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
             ReviewWriteScreen(
                 navController = navController,
                 viewModel = reviewViewModel,
-                pastTripTitle = pastTripTitleArg
+                pastTripTitle = pastTripTitleArg,
+                userProfile = UserProfile(profileUri, nickname, gender, age)
             )
         }
 

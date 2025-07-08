@@ -1,4 +1,4 @@
-package customUi.profile // 또는 적절한 패키지
+package com.example.daejeonpass.customUi.profile // 또는 적절한 패키지
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -33,6 +33,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.DaejeonPass.R
 import com.example.daejeonpass.data.ReviewDetails
 import com.example.daejeonpass.model.ReviewViewModel
+import com.example.daejeonpass.model.UserProfile
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -48,6 +49,7 @@ fun ReviewWriteScreen(
     navController: NavController,
     viewModel: ReviewViewModel,
     pastTripTitle: String?, // 어떤 여행에 대한 후기인지 제목을 받아올 수 있음 (선택적)
+    userProfile: UserProfile
     // passedImageUri: Uri? // ProfileScreen에서 이미지를 먼저 선택했다면 전달받을 수 있음
 ) {
     var title by remember { mutableStateOf(pastTripTitle?.let { "$it 후기" } ?: "") }
@@ -103,7 +105,7 @@ fun ReviewWriteScreen(
                                     title = title,
                                     content = content,
                                     authorName = currentAuthorName,
-                                    profileImageUri = R.drawable.basic_profile, // TODO: 현재 사용자 프로필
+                                    profileImageUri = userProfile.profileImage, // TODO: 현재 사용자 프로필
                                     reviewImageRes = imageUriString, // << 변경: 선택된 이미지 URI 문자열 사용
                                     // reviewImageRes = tempImageResForDemo, // << 중요: 실제로는 selectedImageUri 처리 필요
                                     date = currentDate,

@@ -177,11 +177,11 @@ class ReviewViewModel(application: Application) : AndroidViewModel(application) 
     // imageResFromNav 타입을 Int에서 String으로 변경
     fun loadReviewData(reviewId: Int, imageResFromNav: String) {
         viewModelScope.launch {
-            Log.d("ReviewViewModel", "Loading review data for ID: $reviewId, Image: $imageResFromNav")
+            Log.d("ReviewViewModel", "Loading review data for ID: $reviewId")
             // 상세 정보 로드 (기존 _reviewDetails.value?.reviewId == reviewId 비교는
             // imageResFromNav도 고려해야 할 수 있으므로, _reviewDetailsList에서 직접 찾는 것으로 변경)
 
-            val fetchedDetails = _reviewDetailsList.find { it.reviewId == reviewId && it.reviewImageRes == imageResFromNav }
+            val fetchedDetails = _reviewDetailsList.find { it.reviewId == reviewId }
 
             if (fetchedDetails != null) {
                 _reviewDetails.value = fetchedDetails
@@ -213,20 +213,20 @@ class ReviewViewModel(application: Application) : AndroidViewModel(application) 
                 val dummyComments = if (reviewId % 2 == 0) {
                     listOf(
                         ReviewComment( reviewId = reviewId, authorName = "짝수리뷰 팬",
-                            profileImageUri= context.drawablePngToUri(R.drawable.basic_profile, "basic_profile.png"),
+                            profileImageUri= context.drawablePngToUri(R.drawable.review_boy, "review_boy.png"),
                             content = "${reviewId}번째 동행 후기도 아주 좋아요!", timestamp = System.currentTimeMillis(),),
                         ReviewComment( reviewId = reviewId, authorName = "($reviewId)번째 리뷰 팬",
-                            profileImageUri= context.drawablePngToUri(R.drawable.basic_profile, "basic_profile.png"),
-                            content = "이런 정보 아리가또요또요또요대전또요!", timestamp = System.currentTimeMillis(),)
+                            profileImageUri= context.drawablePngToUri(R.drawable.review_boy2, "review_boy2.png"),
+                            content = "좋은 정보 감사합니다!", timestamp = System.currentTimeMillis(),)
                     )
                 } else {
                     listOf(
                         ReviewComment( reviewId = reviewId, authorName = "홀수리뷰 팬",
-                            profileImageUri= context.drawablePngToUri(R.drawable.basic_profile, "basic_profile.png"),
+                            profileImageUri= context.drawablePngToUri(R.drawable.review_boy, "review_boy.png"),
                             content = "와우와우, ${reviewId}번째 동행후기도 알차네요!", timestamp = System.currentTimeMillis(),),
                         ReviewComment( reviewId = reviewId, authorName = "($reviewId)번째 리뷰 팬",
-                            profileImageUri= context.drawablePngToUri(R.drawable.basic_profile, "basic_profile.png"),
-                            content = "와우 프로필 존잘 ㄷㄷ 변우석님도 동행을 가시네.", timestamp = System.currentTimeMillis(),)
+                            profileImageUri= context.drawablePngToUri(R.drawable.review_boy3, "review_boy3.png"),
+                            content = "와우 프로필 존잘 ㄷㄷㅇ", timestamp = System.currentTimeMillis(),)
                     )
                 }
                 commentsList.addAll(dummyComments)
