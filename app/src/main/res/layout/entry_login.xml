@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1CC5C2"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="215dp"
+        android:src="@drawable/daejeonpass_logo_sky" />
+
+    <TextView
+        android:id="@+id/textLogin"
+        android:layout_width="288dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/textImage"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="62dp"
+        android:layout_marginEnd="62dp"
+        android:layout_marginBottom="40dp"
+        android:text="Login"
+        android:textAlignment="center"
+        android:textColor="#F8F8F8"
+        android:textSize="34sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/buttonSelectImage"
+        android:layout_width="70dp"
+        android:layout_height="36dp"
+        android:layout_above="@+id/editNickname"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="17dp"
+        android:layout_marginBottom="24dp"
+        android:background="#F0EFEF"
+        android:text="갤러리" />
+
+    <EditText
+        android:id="@+id/editAge"
+        android:layout_width="168dp"
+        android:layout_height="36dp"
+        android:layout_above="@+id/radioGroupGender"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="90dp"
+        android:layout_marginEnd="17dp"
+        android:layout_marginBottom="30dp"
+        android:background="@color/white"
+        android:hint="연령 입력 (1-100)"
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/TextNickname"
+        android:layout_width="121dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/TextAge"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="43dp"
+        android:layout_marginBottom="30dp"
+        android:text="Nickname"
+        android:textAlignment="textStart"
+        android:textColor="#F8F8F8"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/editNickname"
+        android:layout_width="168dp"
+        android:layout_height="36dp"
+        android:layout_above="@+id/editAge"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="17dp"
+        android:layout_marginBottom="27dp"
+        android:background="@color/white"
+        android:hint="닉네임 입력"
+        android:textAlignment="center" />
+
+    <ImageView
+        android:id="@+id/imageProfile"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_above="@+id/editNickname"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="110dp"
+        android:layout_marginBottom="10dp"
+        android:contentDescription="Profile Image Choice"
+        android:scaleType="centerCrop"
+        android:src="@drawable/basic_profile" />
+
+    <TextView
+        android:id="@+id/TextAge"
+        android:layout_width="121dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/TextGender"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="43dp"
+        android:layout_marginBottom="30dp"
+        android:text="Age"
+        android:textAlignment="textStart"
+        android:textColor="#F8F8F8"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/TextGender"
+        android:layout_width="121dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/LoginSubmit"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="43dp"
+        android:layout_marginBottom="30dp"
+        android:text="Gender"
+        android:textAlignment="textStart"
+        android:textColor="#F8F8F8"
+        android:textSize="24sp" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupGender"
+        android:layout_width="131dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/LoginSubmit"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="30dp"
+        android:orientation="horizontal">
+
+
+        <RadioButton
+            android:id="@+id/radioMale"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="남   "
+            android:textColor="#FFFFFF"
+            android:textSize="20dp" />
+
+        <RadioButton
+            android:id="@+id/radioFemale"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="여"
+            android:textColor="#FFFFFF"
+            android:textSize="20dp" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/textImage"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/TextNickname"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="43dp"
+        android:layout_marginBottom="30dp"
+        android:text="Image"
+        android:textAlignment="textStart"
+        android:textColor="#F8F8F8"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/LoginSubmit"
+        style="@android:style/Widget.DeviceDefault.Light.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:background="#E4E3E3"
+        android:text="SUBMIT" />
+
+</RelativeLayout>

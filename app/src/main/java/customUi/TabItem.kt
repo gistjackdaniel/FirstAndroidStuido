@@ -1,10 +1,9 @@
-// 파일 경로: app/src/main/java/com/example/mytablayoutapp/ui/TabItem.kt
-package com.example.mytablayoutapp.ui // 파일이 위치한 패키지 경로
+// 파일 경로: app/src/main/java/com/example/daejeonpass/ui/TabItem.kt
+package com.example.daejeonpass.customUi // 파일이 위치한 패키지 경로
 
 import androidx.compose.material.icons.Icons // Material Design 아이콘 세트
 import androidx.compose.material.icons.filled.Contacts // 연락처 아이콘
 import androidx.compose.material.icons.filled.PhotoLibrary // 갤러리 아이콘
-import androidx.compose.material.icons.filled.Star // 별 아이콘 (자유 주제용)
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.ui.graphics.vector.ImageVector // 벡터 아이콘을 위한 타입
 

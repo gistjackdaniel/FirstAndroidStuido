@@ -1,4 +1,4 @@
-package com.example.mytaplayoutapp.ui.theme
+package com.example.daejeonpass.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
