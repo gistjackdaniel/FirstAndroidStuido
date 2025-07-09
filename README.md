@@ -28,19 +28,19 @@ z## 👩‍🎓Problem & Solution
 
 [**[영상 1]**](attachment:17e2570f-dcd6-43a1-bbc6-e2cb149f7298:Splash_로그인.mp4)
 
-**[영상 1]**
+
 
 [**[영상 2]**](attachment:c1048b19-af05-4fdd-a437-57bbd6080592:즐겨찾기_정렬.mp4)
 
-**[영상 2]**
+
 
 [**[영상 3]**](attachment:962b6d2a-6031-42dc-8056-7fe5d6ea26db:게시물_등록.mp4)
 
-**[영상 3]**
+
 
 [**[영상 4]**](attachment:bf87c135-fbd8-4b9d-822c-881def26300e:JOIN기능_JOIN내역.mp4)
 
-**[영상 4]**
+
 
 ---
 
@@ -48,7 +48,7 @@ z## 👩‍🎓Problem & Solution
 
 [**[영상 1]**](attachment:f5b32f89-529b-4895-b751-744e9b721793:갤러리_댓글작성.mp4)
 
-**[영상 1]**
+
 
 - 갤러리 탭에서는 다른 사람들의 동행 후기를 볼 수 있습니다.
 - **썸네일 이미지를 클릭**하면 다른 사람들이 작성해놓은 동행 후기를 상세하게 볼 수 있습니다. **댓글 기능**을 통해 다른 사람들과 소통도 할 수 있습니다. (영상 1)
@@ -59,7 +59,7 @@ z## 👩‍🎓Problem & Solution
 
 [**[영상 1]**](attachment:646091cd-a3c2-42bd-a2a6-96c92b6644b4:프로필_탭_후기작성.mp4)
 
-**[영상 1]**
+
 
 - 프로필 탭에서는 예약된 동행 내역과 지난 동행 내역을 확인할 수 있습니다.
 - 예약된 동행 내역 카드를 클릭하면 join 했던 동행 모집 상세 정보를 다시 확인 할 수 있습니다. (영상 1)
@@ -78,6 +78,20 @@ z## 👩‍🎓Problem & Solution
 - 앱 개발은 완전히 처음이어서 잘 할 수 있을까 약간은 두려웠지만, 어플이 설계되는 구조를 하나하나 이해해가면서 앱 개발도 다른 개발과 결국은 같은 맥락으로 할 수 있음을 깨달았습니다.
 - 오늘은 아무 노력해도 안 고쳐지던 오류가 다음 날에는 신기하게도 고쳐지는 현상을 경험했습니다.
 
+-------
+기술적 역경
+- **UI 계층** (Compose UI): MainActivity를 중심으로 HomeScreen, GalleryScreen, ProfileScreen 등의 Composable 함수들이 화면을 구성하며, NavHost를 통해 화면 간 이동을 관리했습니다.
+- ViewModel 계층: UserViewModel, ReviewViewModel, ReservationViewModel이 각 화면의 상태와 각 모델이 로직을 처리합니다. 이 ViewModel들은 MyApplication 클래스를 통해 애플리케이션 스코프에서 관리되어 앱 세션 동안 데이터가 유지되도록 구성했습니다.
+- **데이터 관리**
+
+리뷰/예약 데이터: 현재 ViewModel 내의 mutableStateList에 인메모리(in-memory) 방식으로 저장됩니다. 앱이 완전히 종료되면 데이터는 사라집니다. (영구 저장을 위해서는 Room DB 등의 도입이 필요합니다.)
+
+동행 찾기 게시글: PostRepository라는 싱글톤 객체를 통해 더미 데이터가 관리되었는데 머지 시 뷰모델로 따로 데이터를 저장하던 방식과 달라 헷갈렸습니다. 따라서 데이터를 저장하는 방식 또한 협업 할 때 잘 상의해함을 느꼈습니다. 
+
+사용자 프로필: UserViewModel에서 관리하며, 로그인 시 정보가 업데이트됩니다.
+
+- 겪은 주요 기술적 역경: ViewModel 생명주기 관리: 로그아웃 후 재로그인 시 이전 사용자 데이터(리뷰, 예약)가 사라지는 문제를 해결하기 위해, ViewModel을 Activity/Fragment 스코프가 아닌 Application 스코프로 변경하여 데이터 지속성을 확보했습니다.
+
 ## ⭐별첨부록
 
 https://drive.google.com/file/d/1M6voy-8XPY_kIsaH5zQOYZEbC19tyLAP/view?usp=drive_link
@@ -88,19 +102,13 @@ https://drive.google.com/file/d/1M6voy-8XPY_kIsaH5zQOYZEbC19tyLAP/view?usp=drive
 - 협업 툴: Notion
 - 사용한 기술 : Composable함수를 통한 UI 설계
 
-                               ViewModel + StateFlow
+                               
 ## 3. 기술 스택 (Technology Stack)
 
 | 구분 | 기술 / 서비스 |
 | --- | --- |
 | **Frontend** | Android (Kotlin + Jetpack Compose) |
-| **Backend** | Firebase (Firestore, Auth, Storage) |
-| **지도/위치** | Google Maps SDK for Android |
-| **이미지** | Firebase Storage + Glide/Picasso |
 | **상태 관리** | ViewModel + StateFlow |
-| **네트워킹** | Retrofit + OkHttp |
-| **인증** | Firebase Authentication (Email/Google/Facebook) |
-| **배포** | Google Play Console |
 
 ---
 
