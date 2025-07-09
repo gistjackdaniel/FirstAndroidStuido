@@ -1,8 +1,11 @@
 // UserViewModel.kt (또는 ReservationViewModel.kt)
 package com.example.daejeonpass.model
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.daejeonpass.customUi.profile.ReservationTrip
 import com.example.daejeonpass.model.UserProfile // UserProfile 임포트
 import kotlin.collections.any
@@ -11,7 +14,7 @@ import kotlin.collections.find
 
 
 
-class ReservationViewModel : ViewModel() {
+class ReservationViewModel(application: Application) : AndroidViewModel(application) {
     private val _reservations = mutableStateListOf<ReservationTrip>()
     val reservations: List<ReservationTrip> = _reservations
 
@@ -35,3 +38,4 @@ class ReservationViewModel : ViewModel() {
         }
     }
 }
+

@@ -57,7 +57,7 @@ import com.example.daejeonpass.model.UserProfile
 fun ProfileScreen(
     navController: NavController,
     reviewViewModel: ReviewViewModel, // 기존 ReviewViewModel
-    reservationViewModel: ReservationViewModel = viewModel(), // ReservationViewModel 주입
+    reservationViewModel: ReservationViewModel, // ReservationViewModel 주입
     onNavigateToGallery: () -> Unit
 ) {
     val reservationList = reservationViewModel.reservations

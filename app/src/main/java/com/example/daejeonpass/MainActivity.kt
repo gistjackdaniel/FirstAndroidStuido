@@ -63,7 +63,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.descriptors.PrimitiveKind.SHORT
 import java.io.File
 import java.io.FileOutputStream
-
+import com.example.daejeonpass.MyApplication
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("WrongConstant")
@@ -79,7 +79,12 @@ class MainActivity : ComponentActivity() {
         // setContent 블록 내부에 앱의 전체 UI를 Compose로 정의합니다.
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        val userViewModel = (application as MyApplication).userViewModel
+        // MyApplication에서 UserViewModel과 ReviewViewModel 인스턴스를 가져옵니다.
+        val myApplication = application as MyApplication
+        val userViewModel = myApplication.userViewModel
+        val reviewViewModelFromApp = myApplication.reviewViewModel
+        val reservationViewModelFromApp = myApplication.reservationViewModel
+
 
         setContent {
 
@@ -97,7 +102,9 @@ class MainActivity : ComponentActivity() {
                     age = age,
                     gender = gender,
                     profileUri = profileUri,
-                    userViewModel = userViewModel
+                    userViewModel = userViewModel,
+                    reviewViewModel = reviewViewModelFromApp,
+                    reservationViewModel = reservationViewModelFromApp
                 )
             }
         }
@@ -110,19 +117,12 @@ class MainActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class) // 일부 Material 3 API는 실험적일 수 있음을 명시
 @Composable
-fun MainScreen(nickname: String, age: Int, gender: String, profileUri : Uri?, userViewModel: UserViewModel) {
+fun MainScreen(nickname: String, age: Int, gender: String, profileUri : Uri?, userViewModel: UserViewModel, reviewViewModel: ReviewViewModel, reservationViewModel: ReservationViewModel) {
     Log.d("MainActivity","메인화면 진입시 프사 URI : ${profileUri}")
     // rememberNavController(): 내비게이션 상태를 기억하고 관리하는 NavController 인스턴스를 생성합니다.
     // 화면 회전 등 구성 변경에도 상태를 유지합니다.
     val navController = rememberNavController()
 
-    val application = LocalContext.current.applicationContext as Application
-
-    val reviewViewModel: ReviewViewModel = viewModel(
-        factory = ReviewViewModelFactory(application) // Factory를 통해 'application' 매개변수 간접 전달
-    )
-
-    val reservationViewModel: ReservationViewModel = viewModel()
 
     val tabs = listOf(
         TabItem.Home,
@@ -187,7 +187,7 @@ fun MainScreen(nickname: String, age: Int, gender: String, profileUri : Uri?, us
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifier, reviewViewModel: ReviewViewModel,
-                  nickname: String, age: Int, gender: String, profileUri: Uri?, userViewModel: UserViewModel, reservationViewModel: ReservationViewModel = viewModel()) {
+                  nickname: String, age: Int, gender: String, profileUri: Uri?, userViewModel: UserViewModel, reservationViewModel: ReservationViewModel) {
     val context = LocalContext.current
 
     if(!PostRepository.dummyDataAdded){
@@ -364,7 +364,6 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
                             postDate = post.date, // Post에 날짜 정보가 있다면 사용
                             user = currentLoggedInUser
                         )
-                        navController.popBackStack() // 예시: 상세 화면 닫기
                     },
                 )
             } else {
