@@ -2,7 +2,9 @@
 package com.example.daejeonpass.model
 
 import android.app.Application
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateListOf // SnapshotStateList 사용을 위해 추가
 import androidx.compose.runtime.mutableStateMapOf // mutableStateMapOf 사용을 위해 추가
 import androidx.compose.runtime.snapshots.SnapshotStateList // 타입 명시를 위해 추가
@@ -19,6 +21,8 @@ import java.util.Date
 import java.util.Locale
 import androidx.lifecycle.AndroidViewModel
 import com.example.daejeonpass.utils.drawablePngToUri
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 class ReviewViewModel(application: Application) : AndroidViewModel(application) {
@@ -133,29 +137,33 @@ class ReviewViewModel(application: Application) : AndroidViewModel(application) 
                         reviewId = dummyReviewIdForInitialComments,
                         authorName = "김투어", content = "성심당 최고!",
                         timestamp = System.currentTimeMillis(),
-                        profileImageUri= context.drawablePngToUri(R.drawable.basic_profile, "basic_profile.png")
+                        profileImageUri= context.drawablePngToUri(R.drawable.girl, "girl.png")
                     )
                 )
             )
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun addInitialDummyReviews() {
         val dummyReviewsData = mutableListOf<ReviewDetails>()
         for (i in 1..20) {
             val drawableName = "sample$i"
             val imageResId = getResourceIdByName(drawableName)
 
+            val currentDate = LocalDate.now()
+            val todayFormatter = currentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
             if (imageResId != 0) {
                 dummyReviewsData.add(
                     ReviewDetails(
                         reviewId = i,
                         title = "대전 여행 후기 $i",
-                        content = "정말 즐거운 대전 여행이었어요! 특히 장소 ${i}이(가) 인상적이었습니다. (내용 $i)",
+                        content = "정말 즐거운 대전 여행이었어요! 특히 장소 ${i}의 기억은 인상적이었습니다.",
                         authorName = "여행객 $i",
-                        profileImageUri= context.drawablePngToUri(R.drawable.basic_profile, "basic_profile.png"),
+                        profileImageUri= context.drawablePngToUri(R.drawable.man, "man.png"),
                         reviewImageRes = "android.resource://${context.packageName}/$imageResId",
-                        date = "2024-0${(i % 12) + 1}-${(i % 28) + 1}",
+                        date = "$todayFormatter",
                         rating = (i % 5 + 1).toFloat()
                     )
                 )
@@ -215,7 +223,7 @@ class ReviewViewModel(application: Application) : AndroidViewModel(application) 
                         ReviewComment( reviewId = reviewId, authorName = "짝수리뷰 팬",
                             profileImageUri= context.drawablePngToUri(R.drawable.review_boy, "review_boy.png"),
                             content = "${reviewId}번째 동행 후기도 아주 좋아요!", timestamp = System.currentTimeMillis(),),
-                        ReviewComment( reviewId = reviewId, authorName = "($reviewId)번째 리뷰 팬",
+                        ReviewComment( reviewId = reviewId, authorName = "$reviewId 번째 리뷰 팬",
                             profileImageUri= context.drawablePngToUri(R.drawable.review_boy2, "review_boy2.png"),
                             content = "좋은 정보 감사합니다!", timestamp = System.currentTimeMillis(),)
                     )
@@ -224,9 +232,9 @@ class ReviewViewModel(application: Application) : AndroidViewModel(application) 
                         ReviewComment( reviewId = reviewId, authorName = "홀수리뷰 팬",
                             profileImageUri= context.drawablePngToUri(R.drawable.review_boy, "review_boy.png"),
                             content = "와우와우, ${reviewId}번째 동행후기도 알차네요!", timestamp = System.currentTimeMillis(),),
-                        ReviewComment( reviewId = reviewId, authorName = "($reviewId)번째 리뷰 팬",
+                        ReviewComment( reviewId = reviewId, authorName = "$reviewId 번째 리뷰 팬",
                             profileImageUri= context.drawablePngToUri(R.drawable.review_boy3, "review_boy3.png"),
-                            content = "와우 프로필 존잘 ㄷㄷㅇ", timestamp = System.currentTimeMillis(),)
+                            content = "훌륭한 리뷰에요!", timestamp = System.currentTimeMillis(),)
                     )
                 }
                 commentsList.addAll(dummyComments)

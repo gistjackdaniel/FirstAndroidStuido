@@ -214,10 +214,11 @@ fun ReviewWriteScreen(
             // --- 작성자 정보 (자동으로 표시) ---
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    painter = painterResource(id = R.drawable.basic_profile), // TODO: 현재 사용자 프로필
+                    //painter = rememberAsyncImagePainter(context.drawablePngToUri(R.drawable.review_boy, "review_boy.png")),
+                    painter = rememberAsyncImagePainter(userProfile.profileImage),
                     contentDescription = "프로필 이미지",
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(36.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )

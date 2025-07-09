@@ -109,7 +109,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class) // 일부 Material 3 API는 실험적일 수 있음을 명시
 @Composable
 fun MainScreen(nickname: String, age: Int, gender: String, profileUri : Uri?) {
-
+    Log.d("MainActivity","메인화면 진입시 프사 URI : ${profileUri}")
     // rememberNavController(): 내비게이션 상태를 기억하고 관리하는 NavController 인스턴스를 생성합니다.
     // 화면 회전 등 구성 변경에도 상태를 유지합니다.
     val navController = rememberNavController()
