@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import com.example.DaejeonPass.R
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import com.example.daejeonpass.model.UserViewModel
@@ -76,7 +77,15 @@ class LoginActivity : AppCompatActivity (
                 return@setOnClickListener
             }
 
-            val finalUri = selectedImageUri ?: getDefaultProfileImageUri()
+            Log.d("LoginActivity", "Selected URI: $selectedImageUri")
+
+            val finalUri = selectedImageUri?.let { uri ->
+                val copied = copyImageToCache(uri)
+                Log.d("LoginActivity", "Copied URI: $copied")
+                copied
+            } ?: getDefaultProfileImageUri()
+
+            Log.d("LoginActivity", "최종 URI: $finalUri")
 
             userViewModel.setUserInfo(
                 nickname = nickname,
@@ -127,5 +136,36 @@ class LoginActivity : AppCompatActivity (
             "com.example.daejeonpass.fileprovider",
             file
         )
+    }
+
+    private fun copyImageToCache(uri: Uri): Uri? {
+        return try {
+            val inputStream = contentResolver.openInputStream(uri)
+            if (inputStream == null) {
+                Log.e("copyImageToCache", "inputStream is null")
+                return null
+            }
+
+            val file = File(cacheDir, "user_selected_image.png")
+            val outputStream = FileOutputStream(file)
+
+            inputStream.copyTo(outputStream)
+
+            inputStream.close()
+            outputStream.close()
+
+            val uriResult = FileProvider.getUriForFile(
+                this,
+                "com.example.daejeonpass.fileprovider",
+                file
+            )
+            Log.d("copyImageToCache", "copied URI: $uriResult")
+
+            uriResult
+        } catch (e: Exception) {
+            Log.e("copyImageToCache", "Exception: ${e.message}")
+            e.printStackTrace()
+            null
+        }
     }
 }
