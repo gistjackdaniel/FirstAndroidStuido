@@ -71,12 +71,15 @@ fun CardDetail(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Daejeon Travel Mate") }, // 앱 제목
+                title = { Text("DAEJEON Travel Mate") }, // 앱 제목
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBackIosNew, contentDescription = "뒤로 가기")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xCBEDEEFF)
+                )
             )
         },
         bottomBar = {

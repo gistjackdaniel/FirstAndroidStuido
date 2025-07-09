@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -119,9 +120,12 @@ fun ReviewWriteScreen(
                         },
                         enabled = title.isNotBlank() && content.isNotBlank() && selectedImageUri != null
                     ) {
-                        Text("저장")
+                        Text("저장", color = Color.Black)
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xCBEDEEFF)
+                )
             )
         }
     ) { paddingValues ->
@@ -168,7 +172,7 @@ fun ReviewWriteScreen(
                             modifier = Modifier.size(48.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
-                        Text("사진을 선택하세요", style = MaterialTheme.typography.bodyMedium)
+                        Text("사진을 선택하세요", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
                     }
                 }
             }
@@ -178,9 +182,10 @@ fun ReviewWriteScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("제목") },
+                textStyle = LocalTextStyle.current.copy(color = Color.White),
+                label = { Text("제목", color = Color.White) },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -204,7 +209,8 @@ fun ReviewWriteScreen(
             OutlinedTextField(
                 value = content,
                 onValueChange = { content = it },
-                label = { Text("여행 후기를 작성해주세요.") },
+                label = { Text("여행 후기를 작성해주세요.", color = Color.White) },
+                textStyle = LocalTextStyle.current.copy(color = Color.White),
                 modifier = Modifier
                     .fillMaxWidth()
                     .defaultMinSize(minHeight = 150.dp),
@@ -225,7 +231,7 @@ fun ReviewWriteScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text(currentAuthorName, fontWeight = FontWeight.Bold)
-                    Text(currentDate, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(currentDate, fontSize = 12.sp, color = Color.LightGray)
                 }
             }
         }

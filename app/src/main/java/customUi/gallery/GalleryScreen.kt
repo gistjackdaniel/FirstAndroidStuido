@@ -39,6 +39,7 @@ import com.example.daejeonpass.data.ReviewComment
 import com.example.daejeonpass.model.ReviewViewModel
 import kotlin.text.isNotBlank
 import androidx.compose.runtime.snapshots.SnapshotStateList // 추가
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
 import com.example.daejeonpass.model.UserProfile
@@ -247,7 +248,8 @@ fun ReviewDetailScreen(
                         Text(
                             "아직 댓글이 없습니다. 첫 댓글을 남겨주세요!",
                             modifier = Modifier.padding(vertical = 16.dp),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.LightGray
                         )
                     }
                 } else {
@@ -350,8 +352,9 @@ fun CommentInputSection(onUpload: (String) -> Unit) {
         OutlinedTextField(
             value = comments,
             onValueChange = { comments = it },
-            label = { Text("댓글을 입력하세요") },
-            modifier = Modifier.fillMaxWidth()
+            label = { Text("댓글을 입력하세요", color = Color.LightGray) },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = LocalTextStyle.current.copy(color = Color.White)
         )
 
         Spacer(modifier = Modifier.height(8.dp))

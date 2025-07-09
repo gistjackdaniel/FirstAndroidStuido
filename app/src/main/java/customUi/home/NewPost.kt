@@ -34,6 +34,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -43,6 +44,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -114,7 +116,10 @@ fun NewPost(
                     }) {
                         Icon(Icons.Default.ArrowBackIosNew, contentDescription = "뒤로가기")
                     }
-                })}
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xCBEDEEFF)
+                ))}
     ){  innerPadding ->
             Column(
                 modifier = Modifier.fillMaxSize()
@@ -123,13 +128,14 @@ fun NewPost(
                     .padding(16.dp) // 내부 여백
             ){
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Newspaper, contentDescription = "날짜 선택")
+                    Icon(Icons.Default.Newspaper, contentDescription = "제목 선택")
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedTextField(
                         value = title,
                         onValueChange = { title = it },
-                        label = { Text("제목") },
-                        modifier = Modifier.fillMaxWidth()
+                        label = { Text("제목", color = Color.LightGray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = LocalTextStyle.current.copy(color = Color.White)
                     )
                 }
 
@@ -141,9 +147,10 @@ fun NewPost(
                     OutlinedTextField(
                         value = date,
                         onValueChange = {},
-                        label = { Text("날짜") },
+                        label = { Text("날짜", color = Color.LightGray) },
                         readOnly = true,
-                        modifier = Modifier.weight(1f))
+                        modifier = Modifier.weight(1f),
+                        textStyle = LocalTextStyle.current.copy(color = Color.White))
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(onClick = { showDatePicker = true }) {
                         Icon(Icons.Default.DateRange, contentDescription = "날짜 선택")
@@ -158,14 +165,15 @@ fun NewPost(
                     OutlinedTextField(
                         value = location,
                         onValueChange = { location = it },
-                        label = { Text("장소") },
-                        modifier = Modifier.weight(1f))
+                        label = { Text("장소", color = Color.LightGray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = LocalTextStyle.current.copy(color = Color.White))
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically){
-                    Icon(Icons.Default.PeopleAlt, contentDescription = "날짜 선택")
+                    Icon(Icons.Default.PeopleAlt, contentDescription = "인원 선택")
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("인원 : ", style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.width(8.dp))
@@ -195,13 +203,14 @@ fun NewPost(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.AttachMoney, contentDescription = "날짜 선택")
+                    Icon(Icons.Default.AttachMoney, contentDescription = "금액 선택")
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedTextField(
                         value = price,
                         onValueChange = { price = it.filter { cost -> cost.isDigit() } },
-                        label = { Text("금액") },
-                        modifier = Modifier.fillMaxWidth()
+                        label = { Text("금액", color = Color.LightGray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = LocalTextStyle.current.copy(color = Color.White)
                     )
                 }
 
@@ -209,13 +218,14 @@ fun NewPost(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.CoPresent, contentDescription = "날짜 선택")
+                    Icon(Icons.Default.CoPresent, contentDescription = "기타 선택")
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedTextField(
                         value = gita,
                         onValueChange = { gita = it },
-                        label = { Text("기타") },
-                        modifier = Modifier.fillMaxWidth()
+                        label = { Text("기타", color = Color.LightGray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = LocalTextStyle.current.copy(color = Color.White)
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))

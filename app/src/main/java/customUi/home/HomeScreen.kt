@@ -69,7 +69,10 @@ fun HomeScreen(
                     }) {
                         Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "팝업 아이콘")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xCBEDEEFF)
+                )
             )
         }
     ) { innerPadding ->
