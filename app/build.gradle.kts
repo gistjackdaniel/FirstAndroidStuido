@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.daejeonpass"
+    namespace = "com.example.DaejeonPass"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.mytaplayoutapp"
+        applicationId = "com.example.DaejeongPass"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -60,8 +60,8 @@ dependencies {
     // Material 아이콘 사용을 위한 라이브러리 (선택 사항이지만, 탭 아이콘에 유용)
     implementation("androidx.compose.material:material-icons-core:1.7.0")
     implementation("androidx.compose.material:material-icons-extended:1.7.0")
-    // viewModel() composable function from the androidx.lifecycle:lifecycle-viewmodel-compose library
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.androidx.appcompat)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -70,4 +70,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation("androidx.datastore:datastore:1.1.7")
+    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    implementation("com.google.protobuf:protobuf-javalite:3.18.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
 }

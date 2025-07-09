@@ -1,6 +1,7 @@
 package com.example.daejeonpass.customUi.gallery // 패키지 경로 설정 (앱의 위치 정의)
 
 // ✅ 필요한 Compose UI 컴포넌트 및 라이브러리 import
+import android.util.Log
 import androidx.compose.foundation.Image // 이미지 표시를 위한 컴포넌트
 import androidx.compose.foundation.layout.* // 레이아웃 관련 컴포넌트 (Row, Column 등)
 import androidx.compose.foundation.lazy.grid.GridCells // 그리드 열 설정용
@@ -9,7 +10,6 @@ import androidx.compose.foundation.lazy.grid.items // 그리드 아이템 생성
 import androidx.compose.material.icons.Icons // 기본 제공 아이콘 세트
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarOutline
-import androidx.compose.material.icons.filled.Add // 추가(+) 아이콘 (리뷰 작성용)
 import androidx.compose.material.icons.filled.Notifications // 알림 아이콘
 import androidx.compose.material3.* // Material 3 디자인 시스템 컴포넌트
 import androidx.compose.runtime.Composable // Composable 함수 선언용
@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp // dp 단위 설정용
 import androidx.compose.ui.layout.ContentScale //  ContentScale import 추가
 import androidx.compose.foundation.clickable //  클릭 동작 추가를 위한 import
 import androidx.navigation.NavController
-import com.example.daejeonpass.R
+import com.example.DaejeonPass.R
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,11 +36,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import com.example.daejeonpass.data.ReviewComment
-import com.example.daejeonpass.data.ReviewThumbnailInfo
-import com.example.daejeonpass.model.CommentViewModel
-import com.example.daejeonpass.model.ReviewDetails // 새로 추가한 데이터 클래스 임포트
+import com.example.daejeonpass.model.ReviewViewModel
 import kotlin.text.isNotBlank
 import androidx.compose.runtime.snapshots.SnapshotStateList // 추가
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.rememberAsyncImagePainter
+import com.example.daejeonpass.model.UserProfile
+import com.example.daejeonpass.utils.drawablePngToUri
 
 /**
  * ✅ GalleryScreen (리뷰 화면) Composable 함수
@@ -49,59 +51,55 @@ import androidx.compose.runtime.snapshots.SnapshotStateList // 추가
  * - 각 썸네일 클릭 시 리뷰 상세 화면으로 이동
  */
 @OptIn(ExperimentalMaterial3Api::class) // Experimental API 사용 시 필수 (경고 제거)
-@Composable // Composable 함수 선언 (UI 함수)
-fun GalleryScreen(navController: NavController) {
+@Composable
+fun GalleryScreen(
+    navController: NavController,
+    viewModel: ReviewViewModel // ViewModel 주입
+) {
+    val reviewThumbnails = viewModel.reviewThumbnails // SnapshotStateList 직접 사용
 
-    val thumbnailResources = listOf(
-        R.drawable.sample1, R.drawable.sample2, R.drawable.sample3, R.drawable.sample4,
-        R.drawable.sample5, R.drawable.sample6, R.drawable.sample7, R.drawable.sample8,
-        R.drawable.sample9, R.drawable.sample10, R.drawable.sample11, R.drawable.sample12,
-        R.drawable.sample13, R.drawable.sample14, R.drawable.sample15, R.drawable.sample17,
-        R.drawable.sample18, R.drawable.sample19, R.drawable.sample20
-    )
-
-    val reviewThumbnailInfos: List<ReviewThumbnailInfo> = thumbnailResources.mapIndexed { index, imageRes ->
-        ReviewThumbnailInfo(reviewId = index + 1, imageRes = imageRes) // index + 1을 reviewId로 사용
+    // (디버깅용) thumbnails 리스트가 변경될 때 로그 출력
+    LaunchedEffect(reviewThumbnails.size) {
+        Log.d("GalleryScreen", "Thumbnails list updated. Count: ${reviewThumbnails.size}")
     }
 
-
     Scaffold(
-        // Scaffold: 상단바/하단바/본문 구조를 쉽게 구성하는 레이아웃
-        topBar = { // 상단 앱바 영역
-            TopAppBar(
-                title = { Text("DAEJEON Travel Mate") }, // 앱 제목 표시
-                navigationIcon = {
-                    IconButton(onClick = { /* TODO: 알림 화면 이동 */ }) { // 알림 버튼
-                        Icon(Icons.Default.Notifications, contentDescription = "알림") // 알림 아이콘
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* TODO: 리뷰 작성 화면 이동 */ }) { // 리뷰 작성 버튼
-                        Icon(Icons.Default.Add, contentDescription = "리뷰 작성") // 추가 아이콘
-                    }
+        // ... (TopAppBar 설정은 이전과 유사하게 유지)
+    ) { paddingValues ->
+        if (reviewThumbnails.isEmpty()) {
+            // 후기 없는 경우 UI
+            Box(
+                modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("작성된 후기가 없습니다. 첫 후기를 남겨보세요!")
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                contentPadding = paddingValues,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(items = reviewThumbnails, key = { it.reviewId }) { thumbnailInfo ->
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = thumbnailInfo.imageRes, // imageRes는 String 타입의 URI
+                            placeholder = painterResource(id = R.drawable.loading), // 로딩 중 이미지
+                            error = painterResource(id = R.drawable.error)     // 에러 시 이미지
+                        ),
+                        contentDescription = "리뷰 썸네일 ${thumbnailInfo.reviewId}",
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .padding(4.dp)
+                            .clickable {
+                                // ReviewDetailScreen으로 이동 시 reviewId와 imageRes(String URI) 전달
+                                // URI에 특수문자가 있을 수 있으므로 URL 인코딩 권장
+                                val encodedImageRes = java.net.URLEncoder.encode(thumbnailInfo.imageRes, "UTF-8")
+                                navController.navigate("review_detail/${encodedImageRes}/${thumbnailInfo.reviewId}")
+                            },
+                        contentScale = ContentScale.Crop
+                    )
                 }
-            )
-        },
-    ) { paddingValues -> // Scaffold의 본문 영역 (paddingValues는 상단바 높이 반영용)
-        LazyVerticalGrid( // 스크롤 가능한 그리드 레이아웃
-            columns = GridCells.Fixed(3), // 3열 고정 그리드
-            contentPadding = paddingValues, // 상단/하단 패딩 적용
-            modifier = Modifier.fillMaxSize() // 화면 전체 크기 채움
-        ) {
-            items(reviewThumbnailInfos, key = { it.reviewId }) { thumbnailInfo -> // 썸네일 리스트 아이템 순회
-                Image( // 이미지 표시.
-                            painter = painterResource(id = thumbnailInfo.imageRes), // 리소스 ID로 이미지 로드
-                            contentDescription = "리뷰 썸네일", // 접근성 설명
-                            modifier = Modifier
-                                .aspectRatio(1f) // 정사각형 비율 유지
-                                .padding(4.dp) // 이미지 간 여백 설정
-                                .clickable {
-                                    //  thumbnailInfo에서 reviewId와 imageRes를 가져와 전달하고, 썸네일 클릭 시 리뷰 상세 화면으로 이동
-                                    navController.navigate("review_detail/${thumbnailInfo.imageRes}/${thumbnailInfo.reviewId}")
-                                },
-                            // {onThumbnailClick(imageRes)} , //  클릭 시 이미지 ID 전달
-                    contentScale = ContentScale.Crop //  가로/세로 사진 상관없이 꽉 채움 (중앙 잘림 가능)
-                )
             }
         }
     }
@@ -120,8 +118,9 @@ fun GalleryScreen(navController: NavController) {
 fun ReviewDetailScreen(
     navController: NavController,
     reviewId: Int,          // 네비게이션으로 전달받는 리뷰 ID
-    imageResFromNav: Int, // 네비게이션으로 전달받는 대표 이미지 (ViewModel의 loadReviewData에 사용)
-    viewModel: CommentViewModel // ViewModel 인스턴스
+    imageResFromNav: String, // 네비게이션으로 전달받는 대표 이미지 (ViewModel의 loadReviewData에 사용)
+    viewModel: ReviewViewModel, // ViewModel 인스턴스
+    userProfile: UserProfile
 ) {
     LaunchedEffect(key1 = reviewId, key2 = imageResFromNav) {
         viewModel.loadReviewData(reviewId, imageResFromNav)
@@ -133,6 +132,7 @@ fun ReviewDetailScreen(
     // --- 댓글 상태 가져오는 방식 변경 ---
     // 이전: val commentsState by viewModel.getCommentsFlow(reviewId).collectAsState()
     // 변경: SnapshotStateList를 직접 사용
+    // 이유: reviewDetailsData는 변하지 않는 값이라 StateFlow를 구독하는 형태로 가져오면 되지만, commentsState는 변경될 수 있기 때문
     val commentsState: SnapshotStateList<ReviewComment> = viewModel.getCommentsForReview(reviewId)
     // --- 댓글 상태 가져오는 방식 변경 완료 ---
 
@@ -182,13 +182,14 @@ fun ReviewDetailScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Image(
-                            painter = painterResource(id = details.profileImageRes),// ViewModel 데이터 사용
-                            contentDescription = "프로필 이미지",
+                            painter = rememberAsyncImagePainter(details.profileImageUri),
+                            contentDescription = "작성자 프로필 이미지",
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(CircleShape),
                             contentScale = ContentScale.Crop
                         )
+
 
                         Spacer(modifier = Modifier.width(8.dp))
 
@@ -230,7 +231,11 @@ fun ReviewDetailScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Image(
-                        painter = painterResource(id = details.reviewImageRes),
+                        painter = rememberAsyncImagePainter(
+                            model = details.reviewImageRes, // details.reviewImageRes는 String URI
+                            placeholder = painterResource(id = R.drawable.loading),
+                            error = painterResource(id = R.drawable.error)
+                        ),
                         contentDescription = "대표 이미지",
                         modifier = Modifier
                             .fillMaxWidth()
@@ -260,7 +265,7 @@ fun ReviewDetailScreen(
                         )
                     }
                 } else {
-                    items(items = commentsState, key = { it.id }) { reviewComment ->
+                    items(items = commentsState, key = { comment -> comment.Id }) { reviewComment ->
                         CommentListItemFromData(comment = reviewComment)
                     }
                 }
@@ -270,36 +275,36 @@ fun ReviewDetailScreen(
                     CommentInputSection( // 기존 CommentInputSection 재활용 가능
                         onUpload = { newCommentText ->
                             // 실제 앱에서는 현재 로그인한 사용자 이름을 가져와야 합니다.
-                            viewModel.addCommentToReview(reviewId, "현재 사용자", newCommentText)
+                            viewModel.addCommentToReview(reviewId, userProfile, newCommentText)
                         }
                     )
                 }
             }
         }
     } ?: run {
-    // reviewDetailsData가 null일 경우 (로딩 중) 표시할 UI
-    Scaffold( // Scaffold를 사용하여 TopAppBar 일관성 유지
-        topBar = {
-            TopAppBar(
-                title = { Text("DAEJEON Travel Mate") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로 가기")
-                    }
-                },
-                actions = { /* 로딩 중에는 액션 버튼 비활성화 또는 숨김 처리 가능 */ }
-            )
-        }
-    ){ paddingValues ->
-        Box(
-            modifier = Modifier.fillMaxSize().padding(paddingValues),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-            Text("리뷰를 불러오는 중...", modifier = Modifier.padding(top = 60.dp))
+        // reviewDetailsData가 null일 경우 (로딩 중) 표시할 UI
+        Scaffold( // Scaffold를 사용하여 TopAppBar 일관성 유지
+            topBar = {
+                TopAppBar(
+                    title = { Text("DAEJEON Travel Mate") },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로 가기")
+                        }
+                    },
+                    actions = { /* 로딩 중에는 액션 버튼 비활성화 또는 숨김 처리 가능 */ }
+                )
+            }
+        ){ paddingValues ->
+            Box(
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+                Text("리뷰를 불러오는 중...", modifier = Modifier.padding(top = 60.dp))
+            }
         }
     }
-}
 }
 
 /**
@@ -307,19 +312,22 @@ fun ReviewDetailScreen(
  */
 @Composable
 fun CommentListItemFromData(comment: ReviewComment) {
+    val context = LocalContext.current
+
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             // 프로필 이미지는 comment.profileImageUrl 등이 있다면 사용
             Image(
-                painter = painterResource(id = R.drawable.profile1), // 예시 프로필
-                contentDescription = "프로필 이미지",
+                painter = rememberAsyncImagePainter(context.drawablePngToUri(R.drawable.review_boy, "review_boy.png")),
+                contentDescription = "프로필이미지",
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
+
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = comment.authorName, style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.weight(1f))
@@ -376,6 +384,3 @@ fun CommentInputSection(onUpload: (String) -> Unit) {
         }
     }
 }
-
-
-

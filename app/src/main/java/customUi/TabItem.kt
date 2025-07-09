@@ -1,5 +1,5 @@
-// 파일 경로: app/src/main/java/com/example/mytablayoutapp/ui/TabItem.kt
-package customUi // 파일이 위치한 패키지 경로
+// 파일 경로: app/src/main/java/com/example/daejeonpass/ui/TabItem.kt
+package com.example.daejeonpass.customUi // 파일이 위치한 패키지 경로
 
 import androidx.compose.material.icons.Icons // Material Design 아이콘 세트
 import androidx.compose.material.icons.filled.Contacts // 연락처 아이콘
