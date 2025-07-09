@@ -42,6 +42,7 @@ import coil.request.ImageRequest
 import com.example.daejeonpass.model.TravelMatePost
 import com.example.daejeonpass.model.UserProfile
 import com.example.DaejeonPass.R
+import com.example.daejeonpass.customUi.profile.ProfileScreen
 import com.example.daejeonpass.data.PostRepository
 import com.example.daejeonpass.model.UserViewModel
 import kotlinx.coroutines.TimeoutCancellationException
@@ -49,6 +50,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import java.lang.String.format
+import com.example.daejeonpass.model.ReservationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +60,7 @@ fun CardDetail(
     onJoinClick: () -> Unit,
     navController: NavController,
     user: UserProfile,
-    userViewModel: UserViewModel = viewModel()
+    reservationViewModel: ReservationViewModel = viewModel(),
     ){
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -77,7 +79,6 @@ fun CardDetail(
                 }
             )
         },
-
         bottomBar = {
             Row(
                 modifier = Modifier
@@ -145,14 +146,14 @@ fun CardDetail(
                             // UserProfile 객체 생성 (CardDetail의 매개변수 user 사용)
                             val newParticipant = user // 현재 로그인한 사용자 정보
 
-                            // UserViewModel의 addReservation 함수 호출
-                            userViewModel.addReservation(
-                                tripId = post.id.toString(),
-                                title = post.title,
-                                date = post.date,
+                            // ReservationViewModel addReservation 함수 호출
+                            reservationViewModel.addReservation(
+                                postId = post.id,
+                                postTitle = post.title,
+                                postDate = post.date,
                                 // 요구사항 B에 따라 현재 post의 모든 참여자 + 새로운 참여자를 전달할 수도 있음
                                 // 현재는 새로운 참여자(로그인한 유저)만 전달하는 방식
-                                newParticipant = newParticipant
+                                user = newParticipant
                             )
 
                             // 중요: PostRepository의 TravelMatePost 데이터도 업데이트해야 함
@@ -162,6 +163,10 @@ fun CardDetail(
                             // 실제 구현은 PostRepository의 구조에 따라 달라집니다.
                             // 임시로 Toast 메시지로 대체, 실제로는 Repository 업데이트 필요
                             PostRepository.addParticipantToPost(post.id, newParticipant) // 이 함수 구현 필요!
+
+                            // MainActivity에서 전달된 onJoinClick 콜백 호출
+                            onJoinClick()
+
 
                             coroutineScope.launch {
                                 try {
@@ -270,7 +275,7 @@ fun CardDetail(
                     updatedPost.participants.forEach { participant -> // 업데이트된 참여자 목록 사용
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Image(
-                                painter = rememberAsyncImagePainter(participant.profileImage ?: R.drawable.profile_placeholder), // null 처리
+                                painter = rememberAsyncImagePainter(participant.profileImage ?: R.drawable.basic_profile), // null 처리
                                 contentDescription = "${participant.name}의 프로필 이미지",
                                 modifier = Modifier
                                     .size(50.dp)

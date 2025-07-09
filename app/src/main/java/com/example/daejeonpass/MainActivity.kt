@@ -54,6 +54,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.daejeonpass.customUi.gallery.ReviewDetailScreen
 import com.example.daejeonpass.customUi.profile.ProfileScreen
 import com.example.daejeonpass.customUi.profile.ReviewWriteScreen
+import com.example.daejeonpass.model.ReservationViewModel
 import com.example.daejeonpass.model.ReviewViewModel
 import com.example.daejeonpass.model.ReviewViewModelFactory
 import com.example.daejeonpass.utils.drawablePngToUri
@@ -95,7 +96,8 @@ class MainActivity : ComponentActivity() {
                     nickname = nickname,
                     age = age,
                     gender = gender,
-                    profileUri = profileUri
+                    profileUri = profileUri,
+                    userViewModel = userViewModel
                 )
             }
         }
@@ -108,7 +110,7 @@ class MainActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class) // 일부 Material 3 API는 실험적일 수 있음을 명시
 @Composable
-fun MainScreen(nickname: String, age: Int, gender: String, profileUri : Uri?) {
+fun MainScreen(nickname: String, age: Int, gender: String, profileUri : Uri?, userViewModel: UserViewModel) {
     Log.d("MainActivity","메인화면 진입시 프사 URI : ${profileUri}")
     // rememberNavController(): 내비게이션 상태를 기억하고 관리하는 NavController 인스턴스를 생성합니다.
     // 화면 회전 등 구성 변경에도 상태를 유지합니다.
@@ -119,6 +121,8 @@ fun MainScreen(nickname: String, age: Int, gender: String, profileUri : Uri?) {
     val reviewViewModel: ReviewViewModel = viewModel(
         factory = ReviewViewModelFactory(application) // Factory를 통해 'application' 매개변수 간접 전달
     )
+
+    val reservationViewModel: ReservationViewModel = viewModel()
 
     val tabs = listOf(
         TabItem.Home,
@@ -166,7 +170,9 @@ fun MainScreen(nickname: String, age: Int, gender: String, profileUri : Uri?) {
             navController = navController,
             modifier = Modifier.padding(innerPadding), // 패딩 적용
             reviewViewModel = reviewViewModel,
-            nickname, age, gender, profileUri
+            nickname, age, gender, profileUri,
+            userViewModel = userViewModel,
+            reservationViewModel = reservationViewModel
         )
     }
 }
@@ -181,7 +187,7 @@ fun MainScreen(nickname: String, age: Int, gender: String, profileUri : Uri?) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifier, reviewViewModel: ReviewViewModel,
-                  nickname: String, age: Int, gender: String, profileUri: Uri?) {
+                  nickname: String, age: Int, gender: String, profileUri: Uri?, userViewModel: UserViewModel, reservationViewModel: ReservationViewModel = viewModel()) {
     val context = LocalContext.current
 
     if(!PostRepository.dummyDataAdded){
@@ -268,7 +274,8 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
         }
         composable(TabItem.Profile.route) { // "profile_screen" 경로일 때 ProfileScreen 표시
             ProfileScreen(navController = navController,
-                viewModel = reviewViewModel,
+                reviewViewModel = reviewViewModel,
+                reservationViewModel = reservationViewModel,
                 onNavigateToGallery = {
                     navController.navigate(TabItem.Gallery.route) {
                         // 네비게이션 옵션 (예: 백스택 관리)
@@ -334,10 +341,10 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
             // UserViewModel에서 현재 사용자 정보 가져오기
             // 실제로는 로그인 시점에 UserViewModel에 사용자 정보를 설정해야 함
             val currentLoggedInUser = UserProfile(
-                profileImage = UserViewModel.profileImageUri.value,
-                name = UserViewModel.nickname.value ?: "사용자",
-                gender = UserViewModel.gender.value ?: "?",
-                age = UserViewModel.age.value ?: 0
+                profileImage = profileUri,
+                name = nickname ?: "사용자",
+                gender = gender ?: "?",
+                age = age ?: 0
             )
 
             if (post != null) {
@@ -349,7 +356,16 @@ fun AppNavigation(navController: NavHostController, modifier: Modifier = Modifie
                     },
                     navController = navController,
                     user = currentLoggedInUser, // 현재 로그인한 사용자 정보 전달
-                    userViewModel = UserViewModel // UserViewModel 전달
+                    onJoinClick = { // <<<---- 이 부분을 추가해야 합니다.
+                        // 여기서 ReservationViewModel의 addReservation 호출
+                        reservationViewModel.addReservation(
+                            postId = post.id,
+                            postTitle = post.title,
+                            postDate = post.date, // Post에 날짜 정보가 있다면 사용
+                            user = currentLoggedInUser
+                        )
+                        navController.popBackStack() // 예시: 상세 화면 닫기
+                    },
                 )
             } else {
                 Text("게시물을 찾을 수 없습니다.")

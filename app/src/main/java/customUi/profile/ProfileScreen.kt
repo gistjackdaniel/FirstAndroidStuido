@@ -26,11 +26,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,24 +40,29 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.DaejeonPass.R
 import com.example.daejeonpass.data.ReviewThumbnailInfo
 import com.example.daejeonpass.data.ReviewDetails
+import com.example.daejeonpass.model.ReservationViewModel
 import com.example.daejeonpass.model.ReviewViewModel
+import com.example.daejeonpass.model.UserProfile
 
 /**
  * 프로필 탭에 표시될 화면입니다.
  */
 @Composable
 fun ProfileScreen(
-    navController: NavController, // NavController 주입
-    viewModel: ReviewViewModel,
-    onNavigateToGallery: () -> Unit // 이 부분은 이제 ReviewWriteScreen에서 처리 후 돌아오므로 직접 사용 안 할 수도 있음
+    navController: NavController,
+    reviewViewModel: ReviewViewModel, // 기존 ReviewViewModel
+    reservationViewModel: ReservationViewModel = viewModel(), // ReservationViewModel 주입
+    onNavigateToGallery: () -> Unit
 ) {
-    val reservationList = remember { sampleReservationList() }
+    val reservationList = reservationViewModel.reservations
     val pastTrips = remember { samplePastTripList() }
+
 
     LazyColumn(modifier = Modifier
         .fillMaxSize()
@@ -73,7 +80,7 @@ fun ProfileScreen(
                 )
             }
         } else {
-            items(reservationList) { reservation -> // reservationList의 각 아이템에 대해
+            items(items = reservationList, key = { it.id }) { reservation -> // reservationList의 각 아이템에 대해
                 ReservationCard(trip = reservation)    // ReservationCard를 표시
             }
         }
@@ -156,7 +163,7 @@ fun ReservationCard(trip: ReservationTrip) {
                             painter = if (participant.profileImage != null) { // UserProfile의 profileImage 사용
                                 rememberAsyncImagePainter(model = participant.profileImage)
                             } else {
-                                painterResource(id = R.drawable.profile_placeholder) // 기본 프로필 이미지
+                                painterResource(id = R.drawable.basic_profile) // 기본 프로필 이미지
                             },
                             contentDescription = "${participant.name} 프로필 이미지", // UserProfile의 name 사용
                             modifier = Modifier
@@ -219,12 +226,10 @@ data class PastTrip(
     val imageRes: Int // 후기 작성 시 사용할 이미지 리소스 ID
 )
 
-fun sampleReservationList() = listOf(
-    ReservationTrip(101, "Visit Daejeon Seongsimdang", "2025-08-15", "Jack, Emily"),
-    ReservationTrip(102, "유성온천 족욕체험 예약", "2025-08-01", "김철수, 김영희")
-)
 
 fun samplePastTripList() = listOf(
     PastTrip(201, "대전 스카이로드 야경", "2024-07-10", "이영희", R.drawable.sample3), // 여러분의 drawable 리소스로 변경
     PastTrip(202, "장태산 자연휴양림 힐링", "2024-06-20", "박지민", R.drawable.sample4)  // 여러분의 drawable 리소스로 변경
 )
+
+
