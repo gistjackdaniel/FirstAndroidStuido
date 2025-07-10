@@ -79,16 +79,16 @@ z## 👩‍🎓Problem & Solution
 - 오늘은 아무 노력해도 안 고쳐지던 오류가 다음 날에는 신기하게도 고쳐지는 현상을 경험했습니다.
 
 -------
-기술적 역경
+기술적 역경 및 배운점
 - **UI 계층** (Compose UI): MainActivity를 중심으로 HomeScreen, GalleryScreen, ProfileScreen 등의 Composable 함수들이 화면을 구성하며, NavHost를 통해 화면 간 이동을 관리했습니다.
 - ViewModel 계층: UserViewModel, ReviewViewModel, ReservationViewModel이 각 화면의 상태와 각 모델이 로직을 처리합니다. 이 ViewModel들은 MyApplication 클래스를 통해 애플리케이션 스코프에서 관리되어 앱 세션 동안 데이터가 유지되도록 구성했습니다.
 - **데이터 관리**
 
-리뷰/예약 데이터: 현재 ViewModel 내의 mutableStateList에 인메모리(in-memory) 방식으로 저장됩니다. 앱이 완전히 종료되면 데이터는 사라집니다. (영구 저장을 위해서는 Room DB 등의 도입이 필요합니다.)
+리뷰/예약 데이터: 현재 ViewModel 내의 mutableStateList에 인메모리(in-memory) 방식으로 저장됩니다. 앱이 완전히 종료되면 데이터는 사라집니다. 
 
-동행 찾기 게시글: PostRepository라는 싱글톤 객체를 통해 더미 데이터가 관리되었는데 머지 시 뷰모델로 따로 데이터를 저장하던 방식과 달라 헷갈렸습니다. 따라서 데이터를 저장하는 방식 또한 협업 할 때 잘 상의해함을 느꼈습니다. 
+동행 찾기 게시글: PostRepository라는 싱글톤 객체를 통해 더미 데이터가 관리되었는데 머지 시 뷰모델로 따로 데이터를 저장하던 방식과 달라 헷갈렸습니다. 따라서 데이터를 저장하는 방식 또한 협업 할 때 잘 상의해야함을 느꼈습니다. 
 
-사용자 프로필: UserViewModel에서 관리하며, 로그인 시 정보가 업데이트됩니다.
+사용자 프로필: UserViewModel에서 관리하며, 로그인 시 정보가 업데이트되며 위에서 설명했다시피 앱이 종료되기 전까지 MyApplication 클래스를 통해 애플리케이션 스코프에서 관리되어 앱 세션 동안 유저 데이터가 유지되도록 구성했습니다.
 
 - 겪은 주요 기술적 역경: ViewModel 생명주기 관리: 로그아웃 후 재로그인 시 이전 사용자 데이터(리뷰, 예약)가 사라지는 문제를 해결하기 위해, ViewModel을 Activity/Fragment 스코프가 아닌 Application 스코프로 변경하여 데이터 지속성을 확보했습니다.
 
@@ -116,7 +116,7 @@ https://drive.google.com/file/d/1M6voy-8XPY_kIsaH5zQOYZEbC19tyLAP/view?usp=drive
 
 1. **실시간 1:1 채팅 & 다국어 번역**
     - 매칭 상대와 앱 내 채팅, 자동번역(영어↔한국어 등)
-2. **공식 API 연동**
+2. **외국인 관광객 타켓 공식 API 연동**
     - 현지 교통·티켓(코레일, 버스) 예매 대행
 3. **AI 추천 매칭**
     - 사용자 프로필·이력 기반 동행 AI 매칭 알고리즘
